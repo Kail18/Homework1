@@ -97,6 +97,62 @@ def main() :
     hls_img = cv.cvtColor(img, cv.COLOR_BGR2HLS)
     cv.imwrite('hls_image.png', hls_img)
 
+    # Split the channels, equalize the V channel, and merge back to get the equalized image in HSV color space
+    h, s, v = cv.split(hsv_img)
+
+    v_equalized = cv.equalizeHist(v)
+    hsv_equalized = cv.merge((h, s, v_equalized))
+    result = cv.cvtColor(hsv_equalized, cv.COLOR_HSV2BGR)
+    cv.imwrite('equalized_image.png', result)
+
+    # Original Image Affine Transformations
+
+    img_warpAffine_left = cv.warpAffine(img, cv.getRotationMatrix2D((img.shape[1] / 2, img.shape[0] / 2), 45, 1), (img.shape[1], img.shape[0]), flags=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT, borderValue=(0, 0, 0))
+    img_warpAffine_right = cv.warpAffine(img, cv.getRotationMatrix2D((img.shape[1] / 2, img.shape[0] / 2), -45, 1), (img.shape[1], img.shape[0]), flags=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT, borderValue=(0, 0, 0))
+    cv.imwrite('warped_image_left.png', img_warpAffine_left)
+    cv.imwrite('warped_image_right.png', img_warpAffine_right)
+
+    # Grayscale Image Affine Transformations
+
+    grayscale_img_resize = cv.resize(grayscale_img, (grayscale_img.shape[1] // 2, grayscale_img.shape[0] // 2))
+    grayscale_img_reflection = cv.flip(grayscale_img, 1)
+    cv.imwrite('grayscale_image_resized.png', grayscale_img_resize)
+    cv.imwrite('grayscale_image_reflection.png', grayscale_img_reflection)
+
+    #Binary Image Affine Transformations
+
+    binary_img__translation = cv.warpAffine(binary_img, np.float32([[1, 0, 50], [0, 1, 50]]), (binary_img.shape[1], binary_img.shape[0]))
+    binary_img_resize = cv.resize(binary_img, (binary_img.shape[1] // 2, binary_img.shape[0] // 2))
+    cv.imwrite('binary_image_translated.png', binary_img__translation)
+    cv.imwrite('binary_image_resized.png', binary_img_resize)
+
+    #HSV Image Affine Transformations
+
+    hsv_img_shearing_one = cv.warpAffine(hsv_img, np.float32([[1, 0.5, 0], [0.5, 1, 0]]), (hsv_img.shape[1], hsv_img.shape[0]))
+    hsv_img_shearing_two = cv.warpAffine(hsv_img, np.float32([[1, -0.5, 0], [-0.5, 1, 0]]), (hsv_img.shape[1], hsv_img.shape[0]))
+    cv.imwrite('hsv_image_one_sheared.png', hsv_img_shearing_one)
+    cv.imwrite('hsv_image_two_sheared.png', hsv_img_shearing_two)
+
+    #CIELAB Image Affine Transformations
+
+    cielab_img_rotation = cv.warpAffine(cielab_img, cv.getRotationMatrix2D((cielab_img.shape[1] / 2, cielab_img.shape[0] / 2), 30, 1), (cielab_img.shape[1], cielab_img.shape[0]), flags=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT, borderValue=(0, 0, 0))
+    cielab_img_translation = cv.warpAffine(cielab_img, np.float32([[1, 0, -50], [0, 1, -50]]), (cielab_img.shape[1], cielab_img.shape[0]))
+    cv.imwrite('cielab_image_rotated.png', cielab_img_rotation)
+    cv.imwrite('cielab_image_translated.png', cielab_img_translation)
+
+    #HLS Image Affine Transformations
+
+    hls_img_rotation = cv.warpAffine(hls_img, cv.getRotationMatrix2D((hls_img.shape[1] / 2, hls_img.shape[0] / 2), -30, 1), (hls_img.shape[1], hls_img.shape[0]), flags=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT, borderValue=(0, 0, 0))
+    hls_img_translation = cv.warpAffine(hls_img, np.float32([[1, 0, 50], [0, 1, -50]]), (hls_img.shape[1], hls_img.shape[0]))
+    cv.imwrite('hls_image_rotated.png', hls_img_rotation)
+    cv.imwrite('hls_image_translated.png', hls_img_translation)
+
+    # Equalized Image Affine Transformations
+    result_180_rotation = cv.warpAffine(result, cv.getRotationMatrix2D((result.shape[1] / 2, result.shape[0] / 2), 180, 1), (result.shape[1], result.shape[0]), flags=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT, borderValue=(0, 0, 0))
+    result_shearing = cv.warpAffine(result, np.float32([[1, 0.5, 0.6], [0.5, 1, 0]]), (result.shape[1], result.shape[0]))
+    cv.imwrite('equalized_image_rotated.png', result_180_rotation)
+    cv.imwrite('equalized_image_sheared.png', result_shearing)
+
     
 
 
