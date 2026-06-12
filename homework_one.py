@@ -54,8 +54,41 @@ class ImageStats:
     def print_skewness(self):
         skew_val = stats.skew(self.pixel_data)
         print(f"Skewness: {skew_val}")
+
+class GuassianBlurApplication:
+    def __init__(self, imgArray):
+        self.imgArray = imgArray
+
+    """ This function applies a Gaussian blur to a list of images
+        Parameters: kernel_size: The size of the kernel to be used for blurring (default is 3)
+                    sigmaX: The standard deviation in the X direction for the Gaussian kernel (default is [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5])
+        Returns: returns a new_array of blurred images and original images
     
+    """
     
+    def apply_gaussian_blur(self, kernel_size = 15, sigmaX = None):
+        if sigmaX is None:
+            sigmaX = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+        new_img_array = []
+        names = [
+            'img', 'img_warpAffine_left', 'img_warpAffine_right',
+            'grayscale_img', 'grayscale_img_resize', 'grayscale_img_reflection',
+            'binary_img', 'binary_img__translation', 'binary_img_resize',
+            'hsv_img', 'hsv_img_shearing_one', 'hsv_img_shearing_two', 'cielab_img', 
+            'cielab_img_rotation', 'cielab_img_translation', 'hls_img', 'hls_img_rotation', 
+            'hls_img_translation', 'result', 'result_180_rotation', 'result_shearing'
+            ]
+        count = 0
+        for img in self.imgArray:
+            name = names[count]
+            new_img_array.append(img)
+            for sigma in sigmaX:
+                blurred_img = cv.GaussianBlur(img, (kernel_size, kernel_size), sigma)
+                new_img_array.append(blurred_img)
+                cv.imwrite(f'gaussian_blurred_{name}_k{kernel_size}_s{sigma}.png', blurred_img)
+            count += 1
+        
+        return new_img_array
 
 
 def main() :
@@ -153,7 +186,19 @@ def main() :
     cv.imwrite('equalized_image_rotated.png', result_180_rotation)
     cv.imwrite('equalized_image_sheared.png', result_shearing)
 
-    
+    # Create an array of the current Images
+
+    image_array = [img, img_warpAffine_left, img_warpAffine_right, grayscale_img, grayscale_img_resize, grayscale_img_reflection, binary_img, binary_img__translation, binary_img_resize, hsv_img, hsv_img_shearing_one, hsv_img_shearing_two, cielab_img, cielab_img_rotation, cielab_img_translation, hls_img, hls_img_rotation, hls_img_translation, result, result_180_rotation, result_shearing]
+
+    #Pass the images into the Gaussian Blur Class
+    gaussian_blur = GuassianBlurApplication(image_array)
+    new_img_array = gaussian_blur.apply_gaussian_blur()
+    length = len(new_img_array)
+    print(length)
+
+    personal_gaussian_blur_result = cv.GaussianBlur(result, (15, 15), 65)
+    cv.imwrite('personal_gaussian_blur_result.png', personal_gaussian_blur_result)
+
 
 
 
