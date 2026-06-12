@@ -79,15 +79,14 @@ class GuassianBlurApplication:
             'cielab_img_rotation', 'cielab_img_translation', 'hls_img', 'hls_img_rotation', 
             'hls_img_translation', 'result', 'result_180_rotation', 'result_shearing'
             ]
-        count = 0
-        for img in self.imgArray:
-            name = names[count]
-            new_img_array.append(img)
+        for img, name in zip(self.imgArray, names):
+
+            new_img_array.append((name,img))
             for sigma in sigmaX:
                 blurred_img = cv.GaussianBlur(img, (kernel_size, kernel_size), sigma)
-                new_img_array.append(blurred_img)
+                blur_name = f"{name}_blur_sigma_{sigma}"
+                new_img_array.append((blur_name, blurred_img))
                 cv.imwrite(f'gaussian_blurred_{name}_k{kernel_size}_s{sigma}.png', blurred_img)
-            count += 1
         
         return new_img_array
     
@@ -100,31 +99,31 @@ class DetectionTechniques:
     """
     def apply_sobel_detection(self):
         new_array = []
-        for count, img in enumerate(self.imgArray):
+        for name, img in self.imgArray:
             sobel_x = cv.Sobel(img, cv.CV_64F, 1, 0, ksize=5)
             sobel_y = cv.Sobel(img, cv.CV_64F, 0, 1, ksize=5)
             sobel_combined = cv.magnitude(sobel_x, sobel_y)
-            cv.imwrite(f'sobel_combined{count}.png', sobel_combined)
+            cv.imwrite(f'sobel_{name}.png', sobel_combined)
             new_array.append(sobel_combined)
         return new_array
     def apply_laplacian_detection(self):
         new_array = []
-        for count, img in enumerate(self.imgArray):
+        for name, img in self.imgArray:
             laplacian = cv.Laplacian(img, cv.CV_64F)
-            cv.imwrite(f'laplacian{count}.png', laplacian)
+            cv.imwrite(f'laplacian{name}.png', laplacian)
             new_array.append(laplacian)
         return new_array
     def apply_canny_detection(self, threshold1=100, threshold2=200):
         new_array = []
-        for count, img in enumerate(self.imgArray):
+        for name, img in self.imgArray:
             canny_edges = cv.Canny(img, threshold1, threshold2)
-            cv.imwrite(f'canny_edges{count}.png', canny_edges)
+            cv.imwrite(f'canny_edges{name}.png', canny_edges)
             new_array.append(canny_edges)
         return new_array
     def apply_prewitt_detection(self):
         new_array = []
 
-        for count, img in enumerate(self.imgArray):
+        for name, img in self.imgArray:
 
             if len(img.shape) == 3:
                 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -152,7 +151,7 @@ class DetectionTechniques:
 
             prewitt_display = np.uint8(prewitt_display)
 
-            cv.imwrite(f'prewitt_combined{count}.png', prewitt_display)
+            cv.imwrite(f'prewitt_combined{name}.png', prewitt_display)
 
             new_array.append(prewitt_display)
 
@@ -160,7 +159,7 @@ class DetectionTechniques:
 
 
 def main() :
-    img = cv.imread('myimage.png')
+    img = cv.imread('myImage.png')
     grayscale_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     """
@@ -283,46 +282,6 @@ def main() :
     len_fourth_subset = len(fourth_subset)
     print(len_fourth_subset)
 
-    # Apply different detection techniques to each subset of images
-    #First Detection
-    first_detection = DetectionTechniques(first_subset)
-    first_sobel = first_detection.apply_sobel_detection()
-    first_laplacian = first_detection.apply_laplacian_detection()
-    first_canny = first_detection.apply_canny_detection()
-    first_prewitt = first_detection.apply_prewitt_detection()
-
-    final_first_detection = (
-        first_subset + first_sobel + first_laplacian + first_canny + first_prewitt
-    )
-
-    print(len(final_first_detection))
-
-    #Second Detection
-    second_detection = DetectionTechniques(second_subset)
-    second_sobel = second_detection.apply_sobel_detection()
-    second_laplacian = second_detection.apply_laplacian_detection()
-    second_canny = second_detection.apply_canny_detection()
-    second_prewitt = second_detection.apply_prewitt_detection() 
-
-    final_second_detection = (
-        second_subset + second_sobel + second_laplacian + second_canny + second_prewitt
-    )
-    print(len(final_second_detection))
-
-    #Third Detection
-
-    third_detection = DetectionTechniques(third_subset)
-    third_sobel = third_detection.apply_sobel_detection()
-    third_laplacian = third_detection.apply_laplacian_detection()
-    third_canny = third_detection.apply_canny_detection()
-    third_prewitt = third_detection.apply_prewitt_detection()
-
-    final_third_detection = (
-        third_subset + third_sobel + third_laplacian + third_canny + third_prewitt
-    )
-
-    print(len(final_third_detection))
-
     #Fourth Detection
 
     fourth_detection = DetectionTechniques(fourth_subset)
@@ -334,9 +293,9 @@ def main() :
     final_fourth_detection = (
         fourth_subset + fourth_sobel + fourth_laplacian + fourth_canny + fourth_prewitt
     )
-
     print(len(final_fourth_detection))
 
+        
 
     
 if __name__ == "__main__":

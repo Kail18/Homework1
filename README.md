@@ -17,4 +17,34 @@
 
 ### Question 4: Perform these edge detection techniques on that subset:
 
-1.For Sobel I looked up how to obtain the original file name so that I can keep the original name + \_sobel
+#### Prewitt
+
+1.In my dataset the prewitt detected edges better with higher sigmaX gaussian blur but it did not detect edges well with a translated image
+
+2.Pros: prewitt uses small kernel size resulting in a lower computational cost.
+
+Cons: Prewitt is sensitive to noise.
+
+#### Sobel
+
+1.In my dataset the sobel did better with the higher sigmaX values
+
+2.Pros: Better at handling noise than prewitt. Sobel also uses smaller kernal size making it a low computational demand.
+
+3.Cons: While not as sensitive to noise as prewitt, it still is sensitive to noise. Sobel does better with higher gradient but not as well with thinner edges.
+
+#### Canny
+
+1.In my dataset cannel did better with the lower sigmaX values
+
+2.Pros: Typically a gold standard for line detection. Since canny usually begins with gaussian smoothing it can reduce the image noise before edge detection begins.
+
+3.Cons:Can be more computationally expensive than Sobel and Prewitt. Canny relies strongly on parameter tuning
+
+####
+
+1.In my dataset laplacian did not do well at any sigmaX values
+
+2.Pros: Typically produces a strong edge response.
+
+3.Cons: Sensitive to noise.

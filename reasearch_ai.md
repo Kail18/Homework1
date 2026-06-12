@@ -19,3 +19,23 @@
 
 1. how to do a sobel detection
 2. I used the libraries method call for the sobel detection
+
+## Prompt 5 6:36 6/12
+
+1. what are the pros and cons of prewitt
+2. Gave me generic pros and cons of prewitt
+
+## Prompt 6 6:43 6/12
+
+1. pros and cons sobel
+2. Gave me generic pros and cons of sobel
+
+## Prompt 7
+
+1. pros and cons of canny
+2. Gave me generic pros and cons of sobel
+
+## Prompt 8
+
+1. pros and cons of laplacian
+2. Gave me generic pros and cons of sobel
