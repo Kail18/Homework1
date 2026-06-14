@@ -30,12 +30,21 @@
 1. pros and cons sobel
 2. Gave me generic pros and cons of sobel
 
-## Prompt 7
+## Prompt 7 6:47 6/12
 
 1. pros and cons of canny
 2. Gave me generic pros and cons of sobel
 
-## Prompt 8
+## Prompt 8 6:55 6/12
 
 1. pros and cons of laplacian
 2. Gave me generic pros and cons of sobel
+
+# Prompt 9 11:24 6/14
+
+1. I also uploaded the image of the example prompt.
+   Create 42, 5-image plots of the input image (from the start of part 3) next to the edge-detected images and output 6 random plots to add to the readme. Include information on what processing techniques were used on the images. Your plots should look similar to this:
+
+how to plot this in python
+
+2. It generated the code for the python script in matplot lib. It also added the edge detection techniques

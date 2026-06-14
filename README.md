@@ -48,3 +48,17 @@ Cons: Prewitt is sensitive to noise.
 2.Pros: Typically produces a strong edge response.
 
 3.Cons: Sensitive to noise.
+
+### Edge Detection Plot Examples
+
+![Example 1](readme_plots/sample_name_here.png)
+
+![Example 2](readme_plots/sample_name_here.png)
+
+![Example 3](readme_plots/sample_name_here.png)
+
+![Example 4](readme_plots/sample_name_here.png)
+
+![Example 5](readme_plots/sample_name_here.png)
+
+![Example 6](readme_plots/sample_name_here.png)

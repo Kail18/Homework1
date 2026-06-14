@@ -30,7 +30,8 @@ i. Each entry should include the full prompt, the date and time the prompt was i
     Traceback (most recent call last):
     File "/Users/kailmcguire/Desktop/WSU Computer Science/CS-898(Image Analysis and Comp Vision)/Homework1/homework_one.py", line 282, in <module>
     main()
-    ~~~~^^
+
+    ```^^
     File "/Users/kailmcguire/Desktop/WSU Computer Science/CS-898(Image Analysis and Comp Vision)/Homework1/homework_one.py", line 266, in main
     first_prewitt = first_detection.apply_prewitt_detection()
     File "/Users/kailmcguire/Desktop/WSU Computer Science/CS-898(Image Analysis and Comp Vision)/Homework1/homework_one.py", line 131, in apply_prewitt_detection
@@ -38,6 +39,8 @@ i. Each entry should include the full prompt, the date and time the prompt was i
     cv2.error: OpenCV(4.13.0) /Users/xperience/GHA-OpenCV-Python/\_work/opencv-python/opencv-python/opencv/modules/core/src/mathfuncs.cpp:154: error: (-215:Assertion failed) src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F) in function 'magnitude'\
 
     give me an updated prewitt
+
+    ```
 
 2.  def apply_prewitt_detection(self):
     new_array = []
@@ -75,3 +78,11 @@ i. Each entry should include the full prompt, the date and time the prompt was i
         new_array.append(prewitt_display)
 
     return new_array
+
+# Prompt 4 11:26 6/14
+
+1. I have already done the image generation I just need to plotting and the README copies.
+
+2. It gave me an updated python script using matplot lib
+
+3. I implemented this code into the project.

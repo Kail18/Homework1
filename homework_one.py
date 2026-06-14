@@ -1,7 +1,142 @@
 import cv2 as cv
 import numpy as np
 from scipy import stats
+import matplotlib.pyplot as plt
+import os
+import random
+import shutil
 
+class MyPlots:
+    @staticmethod
+    def safe_name(name):
+        return name.replace(".", "_").replace(" ", "_").replace("/", "_")
+
+    @staticmethod
+    def get_input_path(name, kernel_size=15):
+        if "_blur_sigma_" in name:
+            base_name, sigma = name.split("_blur_sigma_")
+            return f"gaussian_blurred_{base_name}_k{kernel_size}_s{sigma}.png"
+
+        original_name_map = {
+            "img": "myImage.png",
+            "img_warpAffine_left": "warped_image_left.png",
+            "img_warpAffine_right": "warped_image_right.png",
+            "grayscale_img": "grayscale_image.png",
+            "grayscale_img_resize": "grayscale_image_resized.png",
+            "grayscale_img_reflection": "grayscale_image_reflection.png",
+            "binary_img": "binary_image.png",
+            "binary_img__translation": "binary_image_translated.png",
+            "binary_img_resize": "binary_image_resized.png",
+            "hsv_img": "hsv_image.png",
+            "hsv_img_shearing_one": "hsv_image_one_sheared.png",
+            "hsv_img_shearing_two": "hsv_image_two_sheared.png",
+            "cielab_img": "cielab_image.png",
+            "cielab_img_rotation": "cielab_image_rotated.png",
+            "cielab_img_translation": "cielab_image_translated.png",
+            "hls_img": "hls_image.png",
+            "hls_img_rotation": "hls_image_rotated.png",
+            "hls_img_translation": "hls_image_translated.png",
+            "result": "equalized_image.png",
+            "result_180_rotation": "equalized_image_rotated.png",
+            "result_shearing": "equalized_image_sheared.png",
+        }
+
+        return original_name_map[name]
+
+    @staticmethod
+    def pipeline_text(name, sample_num):
+        text = f"Sample {sample_num} Pipeline Trajectory:\n"
+
+        if "_blur_sigma_" in name:
+            base_name, sigma = name.split("_blur_sigma_")
+            text += f"{base_name}\n→ Gaussian Blur(k:15, σ:{sigma})"
+        else:
+            text += f"{name}\n→ No Gaussian Blur"
+
+        return text
+
+    @staticmethod
+    def make_five_image_plot(name, sample_num, output_path, kernel_size=15):
+        input_path = MyPlots.get_input_path(name, kernel_size)
+
+        paths = {
+            "Sobel Edge": f"sobel_{name}.png",
+            "Laplacian Edge": f"laplacian{name}.png",
+            "Input Image": input_path,
+            "Canny Edge": f"canny_edges{name}.png",
+            "Prewitt Edge": f"prewitt_combined{name}.png",
+        }
+
+        images = {}
+        for label, path in paths.items():
+            if label == "Input Image":
+                images[label] = cv.imread(path)
+            else:
+                images[label] = cv.imread(path, cv.IMREAD_GRAYSCALE)
+
+            if images[label] is None:
+                raise FileNotFoundError(f"Could not find image for {label}: {path}")
+
+        fig = plt.figure(figsize=(12, 10))
+        fig.patch.set_facecolor("#1e1e1e")
+
+        fig.suptitle(
+            MyPlots.pipeline_text(name, sample_num),
+            color="cyan",
+            fontsize=14,
+            y=0.98
+        )
+
+        positions = {
+            "Sobel Edge": [0.35, 0.62, 0.30, 0.22],
+            "Laplacian Edge": [0.02, 0.32, 0.30, 0.22],
+            "Input Image": [0.35, 0.32, 0.30, 0.22],
+            "Canny Edge": [0.68, 0.32, 0.30, 0.22],
+            "Prewitt Edge": [0.35, 0.04, 0.30, 0.22],
+        }
+
+        for title, pos in positions.items():
+            ax = fig.add_axes(pos)
+            ax.set_title(title, color="white", fontsize=11)
+            ax.axis("off")
+
+            if title == "Input Image":
+                ax.imshow(cv.cvtColor(images[title], cv.COLOR_BGR2RGB))
+            else:
+                ax.imshow(images[title], cmap="gray")
+
+        plt.savefig(output_path, facecolor=fig.get_facecolor(), bbox_inches="tight", dpi=150)
+        plt.close()
+
+    @staticmethod
+    def create_42_plots_and_copy_6(subset, output_folder="five_image_plots", readme_folder="readme_plots"):
+        os.makedirs(output_folder, exist_ok=True)
+        os.makedirs(readme_folder, exist_ok=True)
+
+        all_plot_paths = []
+
+        for i, (name, img) in enumerate(subset):
+            safe = MyPlots.safe_name(name)
+            output_path = os.path.join(output_folder, f"sample_{i}_{safe}.png")
+
+            MyPlots.make_five_image_plot(
+                name=name,
+                sample_num=i,
+                output_path=output_path
+            )
+
+            all_plot_paths.append(output_path)
+
+        chosen_plots = random.sample(all_plot_paths, 6)
+
+        print("README plots:")
+        for path in chosen_plots:
+            filename = os.path.basename(path)
+            copied_path = os.path.join(readme_folder, filename)
+            shutil.copy2(path, copied_path)
+            print(copied_path)
+
+        return chosen_plots
 
 class ImageStats:
     def __init__(self, img):
@@ -96,6 +231,8 @@ class DetectionTechniques:
     
     """
         Method for doing a Sobel detection to a list of images
+
+        Returns: a new list of images passed through Sobel detection
     """
     def apply_sobel_detection(self):
         new_array = []
@@ -106,6 +243,12 @@ class DetectionTechniques:
             cv.imwrite(f'sobel_{name}.png', sobel_combined)
             new_array.append(sobel_combined)
         return new_array
+    
+    """
+        Method for doing a laplacian detection to a list of images
+
+        Returns: a new list of images passed through laplacian detection
+    """
     def apply_laplacian_detection(self):
         new_array = []
         for name, img in self.imgArray:
@@ -113,6 +256,12 @@ class DetectionTechniques:
             cv.imwrite(f'laplacian{name}.png', laplacian)
             new_array.append(laplacian)
         return new_array
+    
+    """
+        Method for doing a canny detection to a list of images
+
+        Returns: a new list of images passed through canny detection
+    """
     def apply_canny_detection(self, threshold1=100, threshold2=200):
         new_array = []
         for name, img in self.imgArray:
@@ -120,6 +269,13 @@ class DetectionTechniques:
             cv.imwrite(f'canny_edges{name}.png', canny_edges)
             new_array.append(canny_edges)
         return new_array
+    
+    """
+        Method for doing a prewitt detection to a list of images
+
+        Returns: a new list of images passed through prewitt detection
+    """
+
     def apply_prewitt_detection(self):
         new_array = []
 
@@ -162,9 +318,7 @@ def main() :
     img = cv.imread('myImage.png')
     grayscale_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    """
-    Question 1: nFind and print basic image statistics of the original image for each individual channel (min, max, average, median, mode, skew, range, standard deviation, variance)
-    """
+    # Question 1: Find and print basic image statistics of the original image for each individual channel (min, max, average, median, mode, skew, range, standard deviation, variance)
 
     img_stats = ImageStats(grayscale_img)
     img_stats.print_min_max_range()
@@ -294,6 +448,12 @@ def main() :
         fourth_subset + fourth_sobel + fourth_laplacian + fourth_canny + fourth_prewitt
     )
     print(len(final_fourth_detection))
+
+    # Plotting call
+
+    MyPlots.create_42_plots_and_copy_6(fourth_subset)
+
+
 
         
 
