@@ -29,3 +29,9 @@
 1. Multi-Channel Color Normalization: Load the original image from Homework One. Split the image into its three color channels (e.g., R, G, and B or via the V channel in HSV / L channel in LAB). Apply Histogram Equalization independently to all three channels to normalize illumination and maximize contrast across the entire color spectrum. Merge the channels back together to create a fully normalized color image. Save this normalized color image; it will serve as the primary input for all subsequent segmentation tasks. What is the reasoning for these steps?
 
 2. The main points were segmentation works best when the image has consistent lighting and stronger contrast.
+
+## Prompt 6 14:41 6/24/26
+
+1. how to do Otsu global threshold
+
+2. First I need to convert the normalized image to grayscale. Then I implemented the recommended setup for calling the cv.threshold function.

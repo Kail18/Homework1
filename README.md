@@ -1,5 +1,7 @@
 # Main Project README
 
+# Homework 1
+
 ## Part 2
 
 ### Question1: Find and print basic image statistics of the original image for each individual channel (min, max, average, median, mode, skew, range, standard deviation, variance)
@@ -62,3 +64,9 @@ Cons: Prewitt is sensitive to noise.
 ![Example 5](readme_plots/sample_37_result_shearing_blur_sigma_1_5.png)
 
 ![Example 6](readme_plots/sample_39_result_shearing_blur_sigma_2_5.png)
+
+# Homework 2
+
+## The Setup
+
+1. I set up the directories inside a class so that I can then call each of the direcories when I want to save the future output images.
