@@ -1,0 +1,74 @@
+import cv2 as cv
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+import os
+import random
+import shutil
+from pathlib import Path
+
+from pathlib import Path
+import cv2 as cv
+
+class DirectorySetup:
+
+
+    BASE_DIR = Path(__file__).resolve().parent
+    IMAGE_PATH = BASE_DIR / "myImage.png"
+
+    OUTPUT_DIR = BASE_DIR / "generated_images"
+
+    CHANELS_DIR = OUTPUT_DIR / "channels"
+    NORMALIZED_DIR = OUTPUT_DIR / "normalized"
+    OTSU_DIR = OUTPUT_DIR / "otsu"
+    ADAPTIVE_DIR = OUTPUT_DIR / "adaptive_gaussian"
+    KMEANS_DIR = OUTPUT_DIR / "kmeans_hsv"
+    MASKS_DIR = OUTPUT_DIR / "masks"
+    PLOTS_DIR = OUTPUT_DIR / "plots"
+
+
+    def make_directories(self):
+        for folder in [
+            self.CHANELS_DIR,
+            self.NORMALIZED_DIR,
+            self.OTSU_DIR,
+            self.ADAPTIVE_DIR,
+            self.KMEANS_DIR,
+            self.MASKS_DIR,
+            self.PLOTS_DIR,
+        ]:
+            folder.mkdir(parents=True, exist_ok=True)
+
+
+def main():
+    setup = DirectorySetup()
+    setup.make_directories()
+
+    img = cv.imread('homework_two/python_script_og_image/myImage.png')
+
+    if img is None:
+        print("Could not read the image.")
+        return
+    
+    ## Split the image into its color channels
+    
+    blue_channel, green_channel, red_channel = cv.split(img)
+
+    ## Equalize the histogram of each channel
+
+    equalized_red_channel = cv.equalizeHist(red_channel)
+    equalized_green_channel = cv.equalizeHist(green_channel)
+    equalized_blue_channel = cv.equalizeHist(blue_channel)
+
+    ## Merge the equalized channels back into a single image
+
+    normalized_image = cv.merge((equalized_blue_channel, equalized_green_channel, equalized_red_channel))
+    cv.imwrite(str(setup.NORMALIZED_DIR / "normalized_image.png"), normalized_image)
+
+    
+
+
+
+
+if __name__ == "__main__":
+    main()
