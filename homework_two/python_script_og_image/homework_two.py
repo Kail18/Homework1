@@ -68,20 +68,16 @@ def main():
 
     ## Otsu and Adaptive Gaussian Thresholding
     greyscale_image = cv.cvtColor(normalized_image, cv.COLOR_BGR2GRAY)
-    otsu_threshold, otsu_image = cv.threshold(greyscale_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-    adaptive_gaussian_image = cv.adaptiveThreshold(greyscale_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
+    otsu_threshold, otsu_mask = cv.threshold(greyscale_image, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+    adaptive_gaussian_mask = cv.adaptiveThreshold(greyscale_image, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
 
-    ostu_segmented = cv.bitwise_and(normalized_image, normalized_image, mask=otsu_image)
-    adaptive_segmented = cv.bitwise_and(normalized_image, normalized_image, mask=adaptive_gaussian_image)
+    ostu_segmented = cv.bitwise_and(normalized_image, normalized_image, mask=otsu_mask)
+    adaptive_segmented = cv.bitwise_and(normalized_image, normalized_image, mask=adaptive_gaussian_mask)
 
-    cv.imwrite(str(setup.OTSU_DIR / "otsu_image.png"), otsu_image)
+    cv.imwrite(str(setup.OTSU_DIR / "otsu_image.png"), otsu_mask)
     cv.imwrite(str(setup.OTSU_DIR / "otsu_segmented_image.png"), ostu_segmented)
-    cv.imwrite(str(setup.ADAPTIVE_DIR / "adaptive_gaussian_image.png"), adaptive_gaussian_image)
+    cv.imwrite(str(setup.ADAPTIVE_DIR / "adaptive_gaussian_image.png"), adaptive_gaussian_mask)
     cv.imwrite(str(setup.ADAPTIVE_DIR / "adaptive_segmented_image.png"), adaptive_segmented)
-
-
-
-
 
 
 
