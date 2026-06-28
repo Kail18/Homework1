@@ -40,6 +40,17 @@ class DirectorySetup:
             folder.mkdir(parents=True, exist_ok=True)
 
 class Clustering:
+
+    """ This function saves a binary mask and segmeted image for a given cluster in the HSV color space using K-means clustering.
+        Args: normalized_image: The input image that has been normalized.
+                setup: An instance of the DirectorySetup class to manage output directories.
+                k: The number of clusters to form.
+                target_cluster: The specific cluster to extract and save as a binary mask and segmented image.
+        Returns:  binary_mask: A binary mask where the pixels belonging to the target cluster are white (255) and all others are black (0).
+                    segmented_image: The original image with only the pixels of the target cluster retained, and all other pixels set to black.
+                    centers: The centers of the clusters formed by K-means clustering in the HSV color space.
+    """
+
     def apply_kmeans_hsv(normalized_image, setup, k, target_cluster):
         hsv_image = cv.cvtColor(normalized_image, cv.COLOR_BGR2HSV)
 

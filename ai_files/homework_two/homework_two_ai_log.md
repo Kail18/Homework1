@@ -112,3 +112,13 @@
    Save the resulting binary masks and the segmented foreground extractions for both methods.
 
    2. I went ahead and threw this in because I implemented the code output from the previous recommended code and it was not correct. This was to realign the parameters for the AI to give the type of code I was looking for.
+
+   ## Prompt 13 8:03 6/28/26
+
+   1. What are the pros and cons of adaptive segmentation, otsu, and k-means? Include how each approach is affected by background noise. Also describe how the color normalization affects the final segmentation for all three.
+
+   2.
+
+   ## Prompt 14 8:09 6/28/26
+
+   1. Small background details may be detected as foreground. The result depends heavily on the parameters, especially the block size and constant value C. Go in further detail on how and why this occurs.
