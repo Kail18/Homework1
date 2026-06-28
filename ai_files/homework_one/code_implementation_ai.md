@@ -86,3 +86,9 @@ i. Each entry should include the full prompt, the date and time the prompt was i
 2. It gave me an updated python script using matplot lib
 
 3. I implemented this code into the project.
+
+# Prompt 3 11:51 6/28
+
+1. I provided the homework 1 file. This chat is to clean up homework one file to do what we did in homework 2 by separating the results into different directories.
+
+2. I implemented the cleaned file in a seperate file for testing.

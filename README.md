@@ -53,17 +53,17 @@ Cons: Prewitt is sensitive to noise.
 
 ### Edge Detection Plot Examples
 
-![Example 1](readme_plots/sample_0_hls_img_blur_sigma_3_0.png)
+![Example 1](homework_one/generated_images/readme_plots/sample_3_hls_img_rotation_blur_sigma_0_5.png)
 
-![Example 2](readme_plots/sample_18_result.png)
+![Example 2](homework_one/generated_images/readme_plots/sample_5_hls_img_rotation_blur_sigma_1_5.png)
 
-![Example 3](readme_plots/sample_19_result_blur_sigma_0_5.png)
+![Example 3](homework_one/generated_images/readme_plots/sample_27_result_180_rotation_blur_sigma_0_5.png)
 
-![Example 4](readme_plotssample_28_result_180_rotation_blur_sigma_1_0.png)
+![Example 4](homework_one/generated_images/readme_plots/sample_29_result_180_rotation_blur_sigma_1_5.png)
 
-![Example 5](readme_plots/sample_37_result_shearing_blur_sigma_1_5.png)
+![Example 5](homework_one/generated_images/readme_plots/sample_30_result_180_rotation_blur_sigma_2_0.png)
 
-![Example 6](readme_plots/sample_39_result_shearing_blur_sigma_2_5.png)
+![Example 6](homework_one/generated_images/readme_plots/sample_34_result_shearing.png)
 
 # Homework 2
 

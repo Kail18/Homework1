@@ -7,8 +7,6 @@ import random
 import shutil
 from pathlib import Path
 
-from pathlib import Path
-import cv2 as cv
 
 class DirectorySetup:
 
