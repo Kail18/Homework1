@@ -117,8 +117,60 @@
 
    1. What are the pros and cons of adaptive segmentation, otsu, and k-means? Include how each approach is affected by background noise. Also describe how the color normalization affects the final segmentation for all three.
 
-   2.
+   2. Gave me an Overview of the pros, cons, effect of background noise, and effect of color normalization for the different techniques.
 
    ## Prompt 14 8:09 6/28/26
 
    1. Small background details may be detected as foreground. The result depends heavily on the parameters, especially the block size and constant value C. Go in further detail on how and why this occurs.
+
+   2. Gave me a slightly more in depth discussion on how block size and the value of C affects Adaptive Gaussian Thresholding.
+
+   ## Prompt 15 9:05 6/28/26
+
+   1. Does the ground truth need to be done to each of the segmentation process or just to the initial image? What is the purpose of the ground truth since I already know what the object I am trying to detect is.
+
+   2. I was asking to confirm what I already believed was correct this was for further validation. The output was what I expected. The ground truth is done to the intial image and its purpose is to evaluate the differents models performance.
+
+   ## Prompt 16 9:11 6/28/26
+
+   1. In what way would you recommend we automate the ground truth?
+
+   2. It recommended using GrabCut. I implemented the recommended code for GrabCut. This did not work, so I will dive deeper into the code.
+
+   ## Prompt 17 9:23 6/28/26
+
+   1. I have not used used GrabCut before. Break down each part of the recommended code. Also walk me through how GrabCut works.
+
+   2. I should have just had it discribe the GrabCut library. It broke down everything including the function call.
+
+   ## Prompt 18 9:28 6/28/26
+
+   1. So I need to set the rectangles dimensions manually to include the unknown figure?
+
+   2. It confirmed my suspician. It also recommended I use selectROI for determining the rectangle.
+
+   ## Prompt 19 9:40 6/28/26
+
+   1. The GrabCut is not determining the unknown figure and is outlining the background noise
+
+   ## Prompt 20 10:06 6/28/26
+
+   1. Skip GrabCut and manually trace the unknown figure as a polygon mask.
+
+   how would I do this
+
+   2. It gave me some code to implement to draw the ground truth.
+
+   ## Prompt 21 10:29 6/28/26
+
+   1. How to do Part 5 question 2
+
+   2. Gave me some code to implement for making a binary mask and how to calculate the IOU.
+
+   Then it gave me a function to evaluate the three methods
+
+   ## Prompt 22 11:14 6/28/26
+
+   1. How to create the plot in part 5 question 3 for the README?
+
+   2. Gave the code for the plot.
