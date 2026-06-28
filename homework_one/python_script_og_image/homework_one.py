@@ -315,7 +315,7 @@ class DetectionTechniques:
 
 
 def main() :
-    img = cv.imread('myImage.png')
+    img = cv.imread('/Users/kailmcguire/Desktop/WSU Computer Science/CS-898(Image Analysis and Comp Vision)/Homework1/homework_one/python_script_og_image/myImage.png')
     grayscale_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     # Question 1: Find and print basic image statistics of the original image for each individual channel (min, max, average, median, mode, skew, range, standard deviation, variance)
