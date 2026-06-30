@@ -1,5 +1,7 @@
 # Project Setup and Repository Organization
 
+## Project Overview
+
 This project has multiple Assignments each assigment has their own README.md file. Look at each of the seperate assignments directories for their README breakdown.
 
 ## Repository Structure
@@ -26,3 +28,29 @@ Homework1/
     ├── myImage.png
     └── generated_images/
 ```
+
+## Setup Instructions
+
+This project was written in Python using OpenCV, NumPy, SciPy, and Matplotlib
+
+## Required Libraries
+
+pip install opencv-python numpy scipy matplotlib
+
+## Input Image
+
+The input image name needs to be myImage.py
+
+## To execute
+
+### Homework 1
+
+In the terminal in homework_one directory
+
+python homework_one.py
+
+### Homework 2
+
+In the terminal in homework_two directory
+
+python homework_two.py
