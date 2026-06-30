@@ -13,7 +13,7 @@
 3.I used a counter for a quick fix to a problem with my initial naming. I was naming the files for each kernel and each sigmaX value but I was not keeping track of the original image name. This was causing each iteration to overwrite the file.
 4.The sigmaX value increases the blurriness, but it was noticeable when I used a sigmaX of 20 or higher.
 
-## Part 3
+## Edge Detection Analysis
 
 For this section I applied four different edge detection techniques to the selected subset of generated images: Sobel, Laplacian, Canny, and Prewitt. The selected subsets included transformed and Gaussian-blurred versions of the image, which made it possible to compare how each detector responded to different levels of smoothing and image transformation.
 
@@ -25,11 +25,13 @@ Prewitt was still able to detect with the heavily transformed images. This still
 
 #### Sobel
 
-1.In my dataset the sobel did better with the higher sigmaX values
+Like the Prewitt, Sobel performed better when the image had been smoothed with a stronger Gaussian blur. As the sigma increased there was an improvement on the edge detection. This occured because there was decrease in background noise.
 
-2.Pros: Better at handling noise than prewitt. Sobel also uses smaller kernal size making it a low computational demand.
+Like the Prewitt the Sobel detection was able to detect the transformed images. Also similar to Prewitt there was a diminished detection from the transformed images.
 
-3.Cons: While not as sensitive to noise as prewitt, it still is sensitive to noise. Sobel does better with higher gradient but not as well with thinner edges.
+There was a slight improvement on the edge detection for Sobel vs the Prewitt images. This likely occured since Sobel gives a higher weight to nearby pixels.
+
+Like Prewitt the main weakness observed was that it required a Gaussian blur and smoothing before it was able to detect edges.
 
 #### Canny
 
