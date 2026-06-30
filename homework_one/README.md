@@ -23,9 +23,9 @@ Prewitt produced simple edge maps and worked best when the image had already bee
 
 Prewitt was still able to detect with the heavily transformed images. This still was only able to be seen for the higher sigma images. While it was able to detect the edges on those images it was not as strong as a detection as the untransformed images.
 
-![Positive Example](homework_one/generated_images/prewitt/gaussian_blur/prewitt_combined_result_180_rotation_blur_sigma_3.5.png)
+![Positive Example](generated_images/prewitt/gaussian_blur/prewitt_combined_result_180_rotation_blur_sigma_3.5.png)
 
-![Negative Example](homework_one/generated_images/prewitt/gaussian_blur/prewitt_combined_hls_img_translation_blur_sigma_1.5.png)
+![Negative Example](generated_images/prewitt/gaussian_blur/prewitt_combined_hls_img_translation_blur_sigma_1.5.png)
 
 #### Sobel Edge Detection
 
