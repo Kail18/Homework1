@@ -39,7 +39,7 @@ Like Prewitt the main weakness observed was that it required a Gaussian blur and
 
 ![Positive Example](generated_images/sobel/gaussian_blur/sobel_result_180_rotation_blur_sigma_3.5.png)
 
-![Negative Example](homework_one/generated_images/sobel/gaussian_blur/sobel_hls_img_rotation_blur_sigma_2.0.png)
+![Negative Example](generated_images/sobel/gaussian_blur/sobel_hls_img_rotation_blur_sigma_2.0.png)
 
 #### Canny Edge Detection
 
@@ -49,9 +49,9 @@ Unlike Prewitt and Sobel it performed significantly less when the image was tran
 
 For the purpose of detecting the anomaly Canny did not perform well. If our purpose was to detect all the fine detailed edges in the image Canny did perform well. In the low blurred images the detection found all the background noise alonside the anomaly. This was not good because we did not want to detect the background noise.
 
-![Positive Example](homework_one/generated_images/canny/gaussian_blur/canny_edges_result_blur_sigma_0.5.png)
+![Positive Example](generated_images/canny/gaussian_blur/canny_edges_result_blur_sigma_0.5.png)
 
-![Negative Example](homework_one/generated_images/canny/gaussian_blur/canny_edges_result_180_rotation_blur_sigma_3.5.png)
+![Negative Example](generated_images/canny/gaussian_blur/canny_edges_result_180_rotation_blur_sigma_3.5.png)
 
 #### Laplacian
 
@@ -61,18 +61,18 @@ Unlike the other 3 detections the smoothing and Gaussian blur had no effect on t
 
 I only provided the best image because the images speaks for itself for the negative example images.
 
-![Positive Example](homework_one/generated_images/laplacian/color_spaces/laplacian_result.png)
+![Positive Example](generated_images/laplacian/color_spaces/laplacian_result.png)
 
 ### Edge Detection Plot Examples
 
-![Example 1](homework_one/generated_images/readme_plots/sample_5_hls_img_rotation_blur_sigma_1_5.png)
+![Example 1](generated_images/readme_plots/sample_5_hls_img_rotation_blur_sigma_1_5.png)
 
-![Example 2](homework_one/generated_images/readme_plots/sample_5_hls_img_rotation_blur_sigma_1_5.png)
+![Example 2](generated_images/readme_plots/sample_5_hls_img_rotation_blur_sigma_1_5.png)
 
-![Example 3](homework_one/generated_images/readme_plots/sample_27_result_180_rotation_blur_sigma_0_5.png)
+![Example 3](generated_images/readme_plots/sample_27_result_180_rotation_blur_sigma_0_5.png)
 
-![Example 4](homework_one/generated_images/readme_plots/sample_29_result_180_rotation_blur_sigma_1_5.png)
+![Example 4](generated_images/readme_plots/sample_29_result_180_rotation_blur_sigma_1_5.png)
 
-![Example 5](homework_one/generated_images/readme_plots/sample_30_result_180_rotation_blur_sigma_2_0.png)
+![Example 5](generated_images/readme_plots/sample_30_result_180_rotation_blur_sigma_2_0.png)
 
-![Example 6](homework_one/generated_images/readme_plots/sample_34_result_shearing.png)
+![Example 6](generated_images/readme_plots/sample_34_result_shearing.png)
