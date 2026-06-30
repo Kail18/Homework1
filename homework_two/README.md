@@ -32,4 +32,4 @@
 
 4. Color Normalization: Since K-Means uses color to cluster normalization can improve K-Means by making the colors more distinct.
 
-![Segmentation Comparison](homework_two/python_script_og_image/generated_images/plots/segmentation_comparison.png)
+![Segmentation Comparison](homework_two/generated_images/plots/segmentation_comparison.png)
