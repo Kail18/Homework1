@@ -9,14 +9,11 @@ from pathlib import Path
 
 
 class DirectorySetup:
-
-
     BASE_DIR = Path(__file__).resolve().parent
     IMAGE_PATH = BASE_DIR / "myImage.png"
 
     OUTPUT_DIR = BASE_DIR / "generated_images"
 
-    CHANELS_DIR = OUTPUT_DIR / "channels"
     NORMALIZED_DIR = OUTPUT_DIR / "normalized"
     OTSU_DIR = OUTPUT_DIR / "otsu"
     ADAPTIVE_DIR = OUTPUT_DIR / "adaptive_gaussian"
@@ -25,10 +22,8 @@ class DirectorySetup:
     PLOTS_DIR = OUTPUT_DIR / "plots"
     GROUND_TRUTH_DIR = OUTPUT_DIR / "ground_truth"
 
-
     def make_directories(self):
         for folder in [
-            self.CHANELS_DIR,
             self.NORMALIZED_DIR,
             self.OTSU_DIR,
             self.ADAPTIVE_DIR,
@@ -390,7 +385,7 @@ def main():
     setup = DirectorySetup()
     setup.make_directories()
 
-    img = cv.imread('homework_two/python_script_og_image/myImage.png')
+    img = cv.imread(str(setup.IMAGE_PATH))
 
     if img is None:
         print("Could not read the image.")
@@ -456,6 +451,8 @@ def main():
     # cv.destroyWindow("Select unknown figure")
 
     # print("Selected rectangle:", rect)
+
+    # UNCOMMENT out the line of code below this if you need to make the ground truth
 
     # ground_truth_mask, ground_truth_segmented = methods.create_polygon_ground_truth(img, setup)
 
