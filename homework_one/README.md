@@ -37,7 +37,7 @@ There was a slight improvement on the edge detection for Sobel vs the Prewitt im
 
 Like Prewitt the main weakness observed was that it required a Gaussian blur and smoothing before it was able to detect edges.
 
-![Positive Example](homework_one/generated_images/sobel/gaussian_blur/sobel_result_180_rotation_blur_sigma_3.5.png)
+![Positive Example](generated_images/sobel/gaussian_blur/sobel_result_180_rotation_blur_sigma_3.5.png)
 
 ![Negative Example](homework_one/generated_images/sobel/gaussian_blur/sobel_hls_img_rotation_blur_sigma_2.0.png)
 
