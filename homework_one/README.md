@@ -15,15 +15,13 @@
 
 ## Part 3
 
-### Question 4: Perform these edge detection techniques on that subset:
+For this section I applied four different edge detection techniques to the selected subset of generated images: Sobel, Laplacian, Canny, and Prewitt. The selected subsets included transformed and Gaussian-blurred versions of the image, which made it possible to compare how each detector responded to different levels of smoothing and image transformation.
 
-#### Prewitt
+#### Prewitt Edge Detection
 
-1.In my dataset the prewitt detected edges better with higher sigmaX gaussian blur but it did not detect edges well with a translated image
+Prewitt produced simple edge maps and worked best when the image had already been smoothed with a stronger Gaussian blur. In the lower blurred images Prewitt partially picked up the smaller background noise but did not detect the anomoly. As the sigma increased, the noise was reduced, which allowed the prewitt detection to detect the object boundries of the anomaly.
 
-2.Pros: prewitt uses small kernel size resulting in a lower computational cost.
-
-Cons: Prewitt is sensitive to noise.
+Prewitt was still able to detect with the heavily transformed images. This still was only able to be seen for the higher sigma images. While it was able to detect the edges on those images it was not as strong as a detection as the untransformed images.
 
 #### Sobel
 
