@@ -12,8 +12,6 @@ class DirectorySetup:
 
     BASE_DIR = Path(__file__).resolve().parent
 
-    # This keeps the file portable. It will work if myImage.png is beside this
-    # script, or if it is inside the python_script_og_image folder.
     IMAGE_PATH_OPTIONS = [
         BASE_DIR / "myImage.png",
         BASE_DIR / "python_script_og_image" / "myImage.png",
@@ -35,25 +33,47 @@ class DirectorySetup:
     FIVE_IMAGE_PLOTS_DIR = OUTPUT_DIR / "five_image_plots"
     README_PLOTS_DIR = OUTPUT_DIR / "readme_plots"
 
+    EDGE_METHOD_DIRS = {
+        "laplacian": LAPLACIAN_DIR,
+        "sobel": SOBEL_DIR,
+        "canny": CANNY_DIR,
+        "prewitt": PREWITT_DIR,
+    }
+
+    TRANSFORM_TYPES = [
+        "input",
+        "color_spaces",
+        "affine_transformations",
+        "gaussian_blur",
+        "personal_experiment",
+    ]
+
     def __init__(self):
         self.make_directories()
 
     def make_directories(self):
-        for folder in [
+        base_folders = [
             self.OUTPUT_DIR,
             self.INPUT_DIR,
             self.COLOR_SPACE_DIR,
             self.AFFINE_DIR,
             self.GAUSSIAN_DIR,
             self.PERSONAL_DIR,
-            self.LAPLACIAN_DIR,
-            self.SOBEL_DIR,
-            self.CANNY_DIR,
-            self.PREWITT_DIR,
             self.FIVE_IMAGE_PLOTS_DIR,
             self.README_PLOTS_DIR,
-        ]:
+        ]
+
+        for folder in base_folders:
             folder.mkdir(parents=True, exist_ok=True)
+
+        for edge_dir in self.EDGE_METHOD_DIRS.values():
+            edge_dir.mkdir(parents=True, exist_ok=True)
+
+            for transform_type in self.TRANSFORM_TYPES:
+                (edge_dir / transform_type).mkdir(parents=True, exist_ok=True)
+
+    def get_edge_output_path(self, method_name, transform_type, filename):
+        return self.EDGE_METHOD_DIRS[method_name] / transform_type / filename
 
     def get_image_path(self):
         for path in self.IMAGE_PATH_OPTIONS:
@@ -65,7 +85,6 @@ class DirectorySetup:
             "Could not find myImage.png. Put it in one of these locations:\n"
             f"{expected_paths}"
         )
-
 
 class ImageWriter:
     """Small helper so every saved image is checked."""
@@ -100,13 +119,21 @@ class MyPlots:
         return text
 
     @staticmethod
-    def make_five_image_plot(name, input_path, sample_num, output_path, setup):
+    def make_five_image_plot(name, input_path, sample_num, output_path, setup, transform_type):
         paths = {
-            "Sobel Edge": setup.SOBEL_DIR / f"sobel_{name}.png",
-            "Laplacian Edge": setup.LAPLACIAN_DIR / f"laplacian_{name}.png",
+            "Sobel Edge": setup.get_edge_output_path(
+                "sobel", transform_type, f"sobel_{name}.png"
+            ),
+            "Laplacian Edge": setup.get_edge_output_path(
+                "laplacian", transform_type, f"laplacian_{name}.png"
+            ),
             "Input Image": input_path,
-            "Canny Edge": setup.CANNY_DIR / f"canny_edges_{name}.png",
-            "Prewitt Edge": setup.PREWITT_DIR / f"prewitt_combined_{name}.png",
+            "Canny Edge": setup.get_edge_output_path(
+                "canny", transform_type, f"canny_edges_{name}.png"
+            ),
+            "Prewitt Edge": setup.get_edge_output_path(
+                "prewitt", transform_type, f"prewitt_combined_{name}.png"
+            ),
         }
 
         images = {}
@@ -159,7 +186,7 @@ class MyPlots:
     def create_42_plots_and_copy_6(subset, setup):
         all_plot_paths = []
 
-        for i, (name, img, input_path) in enumerate(subset):
+        for i, (name, img, input_path, transform_type) in enumerate(subset):
             safe = MyPlots.safe_name(name)
             output_path = setup.FIVE_IMAGE_PLOTS_DIR / f"sample_{i}_{safe}.png"
 
@@ -169,6 +196,7 @@ class MyPlots:
                 sample_num=i,
                 output_path=output_path,
                 setup=setup,
+                transform_type=transform_type,
             )
 
             all_plot_paths.append(output_path)
@@ -227,16 +255,23 @@ class GaussianBlurApplication:
 
         new_img_array = []
 
-        for name, img, image_path in self.img_array:
-            new_img_array.append((name, img, image_path))
+        for name, img, image_path, transform_type in self.img_array:
+            new_img_array.append((name, img, image_path, transform_type))
 
             for sigma in sigmaX:
                 blurred_img = cv.GaussianBlur(img, (kernel_size, kernel_size), sigma)
+
                 blur_name = f"{name}_blur_sigma_{sigma}"
-                blur_path = self.setup.GAUSSIAN_DIR / f"gaussian_blurred_{name}_k{kernel_size}_s{sigma}.png"
+                blur_path = (
+                    self.setup.GAUSSIAN_DIR
+                    / f"gaussian_blurred_{name}_k{kernel_size}_s{sigma}.png"
+                )
 
                 ImageWriter.save(blur_path, blurred_img)
-                new_img_array.append((blur_name, blurred_img, blur_path))
+
+                new_img_array.append(
+                    (blur_name, blurred_img, blur_path, "gaussian_blur")
+                )
 
         return new_img_array
 
@@ -260,74 +295,113 @@ class DetectionTechniques:
     def apply_sobel_detection(self):
         new_array = []
 
-        for name, img, input_path in self.img_array:
+        for name, img, input_path, transform_type in self.img_array:
             gray_img = self.convert_to_gray(img)
+
             sobel_x = cv.Sobel(gray_img, cv.CV_64F, 1, 0, ksize=5)
             sobel_y = cv.Sobel(gray_img, cv.CV_64F, 0, 1, ksize=5)
+
             sobel_combined = cv.magnitude(sobel_x, sobel_y)
             sobel_display = self.normalize_to_uint8(sobel_combined)
 
-            output_path = self.setup.SOBEL_DIR / f"sobel_{name}.png"
+            output_path = self.setup.get_edge_output_path(
+                "sobel",
+                transform_type,
+                f"sobel_{name}.png",
+            )
+
             ImageWriter.save(output_path, sobel_display)
-            new_array.append(sobel_display)
+
+            new_array.append(
+                (f"sobel_{name}", sobel_display, output_path, transform_type)
+            )
 
         return new_array
 
     def apply_laplacian_detection(self):
         new_array = []
 
-        for name, img, input_path in self.img_array:
+        for name, img, input_path, transform_type in self.img_array:
             gray_img = self.convert_to_gray(img)
-            laplacian = cv.Laplacian(gray_img, cv.CV_64F)
-            laplacian_display = self.normalize_to_uint8(laplacian)
 
-            output_path = self.setup.LAPLACIAN_DIR / f"laplacian_{name}.png"
+            blurred_gray = cv.GaussianBlur(gray_img, (3, 3), 0)
+
+            laplacian = cv.Laplacian(blurred_gray, cv.CV_64F)
+            laplacian_display = cv.convertScaleAbs(laplacian)
+
+            output_path = self.setup.get_edge_output_path(
+                "laplacian",
+                transform_type,
+                f"laplacian_{name}.png",
+            )
+
             ImageWriter.save(output_path, laplacian_display)
-            new_array.append(laplacian_display)
+
+            new_array.append(
+                (f"laplacian_{name}", laplacian_display, output_path, transform_type)
+            )
 
         return new_array
 
     def apply_canny_detection(self, threshold1=100, threshold2=200):
         new_array = []
 
-        for name, img, input_path in self.img_array:
+        for name, img, input_path, transform_type in self.img_array:
             gray_img = self.convert_to_gray(img)
+
             canny_edges = cv.Canny(gray_img, threshold1, threshold2)
 
-            output_path = self.setup.CANNY_DIR / f"canny_edges_{name}.png"
+            output_path = self.setup.get_edge_output_path(
+                "canny",
+                transform_type,
+                f"canny_edges_{name}.png",
+            )
+
             ImageWriter.save(output_path, canny_edges)
-            new_array.append(canny_edges)
+
+            new_array.append(
+                (f"canny_edges_{name}", canny_edges, output_path, transform_type)
+            )
 
         return new_array
 
     def apply_prewitt_detection(self):
         new_array = []
 
-        for name, img, input_path in self.img_array:
+        for name, img, input_path, transform_type in self.img_array:
             gray_img = self.convert_to_gray(img)
 
             kernelx = np.array(
                 [[1, 0, -1],
-                 [1, 0, -1],
-                 [1, 0, -1]],
+                [1, 0, -1],
+                [1, 0, -1]],
                 dtype=np.float32,
             )
 
             kernely = np.array(
                 [[1, 1, 1],
-                 [0, 0, 0],
-                 [-1, -1, -1]],
+                [0, 0, 0],
+                [-1, -1, -1]],
                 dtype=np.float32,
             )
 
             prewitt_x = cv.filter2D(gray_img, cv.CV_32F, kernelx)
             prewitt_y = cv.filter2D(gray_img, cv.CV_32F, kernely)
+
             prewitt_combined = cv.magnitude(prewitt_x, prewitt_y)
             prewitt_display = self.normalize_to_uint8(prewitt_combined)
 
-            output_path = self.setup.PREWITT_DIR / f"prewitt_combined_{name}.png"
+            output_path = self.setup.get_edge_output_path(
+                "prewitt",
+                transform_type,
+                f"prewitt_combined_{name}.png",
+            )
+
             ImageWriter.save(output_path, prewitt_display)
-            new_array.append(prewitt_display)
+
+            new_array.append(
+                (f"prewitt_combined_{name}", prewitt_display, output_path, transform_type)
+            )
 
         return new_array
 
@@ -493,27 +567,34 @@ def main():
 
     # Store each base image with its name and saved file path.
     image_array = [
-        ("img", img, original_input_path),
-        ("img_warpAffine_left", img_warpAffine_left, warped_left_path),
-        ("img_warpAffine_right", img_warpAffine_right, warped_right_path),
-        ("grayscale_img", grayscale_img, grayscale_path),
-        ("grayscale_img_resize", grayscale_img_resize, grayscale_resize_path),
-        ("grayscale_img_reflection", grayscale_img_reflection, grayscale_reflection_path),
-        ("binary_img", binary_img, binary_path),
-        ("binary_img_translation", binary_img_translation, binary_translation_path),
-        ("binary_img_resize", binary_img_resize, binary_resize_path),
-        ("hsv_img", hsv_img, hsv_path),
-        ("hsv_img_shearing_one", hsv_img_shearing_one, hsv_shear_one_path),
-        ("hsv_img_shearing_two", hsv_img_shearing_two, hsv_shear_two_path),
-        ("cielab_img", cielab_img, cielab_path),
-        ("cielab_img_rotation", cielab_img_rotation, cielab_rotation_path),
-        ("cielab_img_translation", cielab_img_translation, cielab_translation_path),
-        ("hls_img", hls_img, hls_path),
-        ("hls_img_rotation", hls_img_rotation, hls_rotation_path),
-        ("hls_img_translation", hls_img_translation, hls_translation_path),
-        ("result", result, equalized_path),
-        ("result_180_rotation", result_180_rotation, result_rotation_path),
-        ("result_shearing", result_shearing, result_shearing_path),
+        ("img", img, original_input_path, "input"),
+
+        ("img_warpAffine_left", img_warpAffine_left, warped_left_path, "affine_transformations"),
+        ("img_warpAffine_right", img_warpAffine_right, warped_right_path, "affine_transformations"),
+
+        ("grayscale_img", grayscale_img, grayscale_path, "color_spaces"),
+        ("grayscale_img_resize", grayscale_img_resize, grayscale_resize_path, "affine_transformations"),
+        ("grayscale_img_reflection", grayscale_img_reflection, grayscale_reflection_path, "affine_transformations"),
+
+        ("binary_img", binary_img, binary_path, "color_spaces"),
+        ("binary_img_translation", binary_img_translation, binary_translation_path, "affine_transformations"),
+        ("binary_img_resize", binary_img_resize, binary_resize_path, "affine_transformations"),
+
+        ("hsv_img", hsv_img, hsv_path, "color_spaces"),
+        ("hsv_img_shearing_one", hsv_img_shearing_one, hsv_shear_one_path, "affine_transformations"),
+        ("hsv_img_shearing_two", hsv_img_shearing_two, hsv_shear_two_path, "affine_transformations"),
+
+        ("cielab_img", cielab_img, cielab_path, "color_spaces"),
+        ("cielab_img_rotation", cielab_img_rotation, cielab_rotation_path, "affine_transformations"),
+        ("cielab_img_translation", cielab_img_translation, cielab_translation_path, "affine_transformations"),
+
+        ("hls_img", hls_img, hls_path, "color_spaces"),
+        ("hls_img_rotation", hls_img_rotation, hls_rotation_path, "affine_transformations"),
+        ("hls_img_translation", hls_img_translation, hls_translation_path, "affine_transformations"),
+
+        ("result", result, equalized_path, "color_spaces"),
+        ("result_180_rotation", result_180_rotation, result_rotation_path, "affine_transformations"),
+        ("result_shearing", result_shearing, result_shearing_path, "affine_transformations"),
     ]
 
     # Apply Gaussian blur to each base image.
