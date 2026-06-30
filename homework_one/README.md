@@ -23,7 +23,11 @@ Prewitt produced simple edge maps and worked best when the image had already bee
 
 Prewitt was still able to detect with the heavily transformed images. This still was only able to be seen for the higher sigma images. While it was able to detect the edges on those images it was not as strong as a detection as the untransformed images.
 
-#### Sobel
+![Positive Example](homework_one/generated_images/prewitt/gaussian_blur/prewitt_combined_result_180_rotation_blur_sigma_3.5.png)
+
+![Negative Example](homework_one/generated_images/prewitt/gaussian_blur/prewitt_combined_hls_img_translation_blur_sigma_1.5.png)
+
+#### Sobel Edge Detection
 
 Like the Prewitt, Sobel performed better when the image had been smoothed with a stronger Gaussian blur. As the sigma increased there was an improvement on the edge detection. This occured because there was decrease in background noise.
 
@@ -33,21 +37,31 @@ There was a slight improvement on the edge detection for Sobel vs the Prewitt im
 
 Like Prewitt the main weakness observed was that it required a Gaussian blur and smoothing before it was able to detect edges.
 
-#### Canny
+![Positive Example](homework_one/generated_images/sobel/gaussian_blur/sobel_result_180_rotation_blur_sigma_3.5.png)
 
-1.In my dataset cannel did better with the lower sigmaX values
+![Negative Example](homework_one/generated_images/sobel/gaussian_blur/sobel_hls_img_rotation_blur_sigma_2.0.png)
 
-2.Pros: Typically a gold standard for line detection. Since canny usually begins with gaussian smoothing it can reduce the image noise before edge detection begins.
+#### Canny Edge Detection
 
-3.Cons:Can be more computationally expensive than Sobel and Prewitt. Canny relies strongly on parameter tuning
+Canny performed the second worst out of the different detections. Unlike Prewitt and Sobel the Canny edge detection performed better with less smoothing and Gaussian Blur.
+
+Unlike Prewitt and Sobel it performed significantly less when the image was transformed. It was able to detect some edges but it was not able to detect the anomaly as a whole.
+
+For the purpose of detecting the anomaly Canny did not perform well. If our purpose was to detect all the fine detailed edges in the image Canny did perform well. In the low blurred images the detection found all the background noise alonside the anomaly. This was not good because we did not want to detect the background noise.
+
+![Positive Example](homework_one/generated_images/canny/gaussian_blur/canny_edges_result_blur_sigma_0.5.png)
+
+![Negative Example](homework_one/generated_images/canny/gaussian_blur/canny_edges_result_180_rotation_blur_sigma_3.5.png)
 
 #### Laplacian
 
-1.In my dataset laplacian did not do well at any sigmaX values
+Laplacian performed the worst out the methods. Laplacian method detects rapid changes in intensity which makes it sensitive to noise.
 
-2.Pros: Typically produces a strong edge response.
+Unlike the other 3 detections the smoothing and Gaussian blur had no effect on the Laplacian detection. While this does not conclude that Laplacian method is a bad method, it is clear the Laplacian method is the wrong method for this particular image detection.
 
-3.Cons: Sensitive to noise.
+I only provided the best image because the images speaks for itself for the negative example images.
+
+![Positive Example](homework_one/generated_images/laplacian/color_spaces/laplacian_result.png)
 
 ### Edge Detection Plot Examples
 
