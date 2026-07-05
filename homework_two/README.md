@@ -74,6 +74,20 @@ The Dice Coefficient also measures overlap, but it gives more weight to the shar
 
 ## Ground Truth Analysis
 
-The ground truth mask was manually created using a polygon selection around the unknown figure.
+The ground truth mask was manually created using a polygon selection around the unknown figure. The mask created was used as a reference for comparing the three segmentation methods.
+
+Based on the quantitative results the ordering from best to worst was K-Means(HSV) > Adaptive Gaussian Thresholding > Otsu Thresholding.
+
+### K-Means
+
+K-Means had a IoU score showing about 18% overlap and a Dice coefficient of 0.3077. This showed the most promising results out of the three but it was still a poor detection method. While some the true object was detected, there was a large portion of the background included in the predicted mask.
+
+### Adaptive Gaussian
+
+Adaptive Gaussian thresholding had the second best or worst result out the three. This method's IoU score showed about 6% overlap and a Dice coefficient of 0.1067. In the Adaptive Gaussian threshold it did partially detect the figure but so much of the background was detected that it resulted in a poor IoU/Dice scores.
+
+### Otsu
+
+Otsu threshold was the least effective. This method's IoU score showed about 3% overlap and a Dice coefficient of 0.0513. Like K-Means and Adaptive, Otsu did partially detect the figure but it also heavily detected the background resulting in a poor IoU/Dice score.
 
 ![Segmentation Comparison](generated_images/plots/segmentation_comparison.png)
