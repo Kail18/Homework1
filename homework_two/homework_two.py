@@ -453,7 +453,6 @@ def main():
     # print("Selected rectangle:", rect)
 
     # UNCOMMENT out the line of code below this if you need to make the ground truth
-
     # ground_truth_mask, ground_truth_segmented = methods.create_polygon_ground_truth(img, setup)
 
     

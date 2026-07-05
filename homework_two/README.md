@@ -1,5 +1,35 @@
 # Homework 2
 
+This assigments goals were to compare different image segmentation techniques on the same input image and to evaluate the methods success at isolating the unknown image. The methods tested in this assignment were Adaptive Gaussian Thresholding, Otsu Thresholding, and K-Means Clustering (in HSV color space).
+
+The final outputs are in a generated_images folder with the important outputs displayed at the bottom of the README.
+
+```text
+homework_two/
+    ├── homework_two.py
+    ├── myImage.png
+    ├── README.md
+    └── generated_images/
+        ├── normalized/
+        ├── otsu/
+        ├── adaptive_gaussian/
+        ├── kmeans_hsv/
+        ├── masks/
+        ├── plots/
+        └── ground_truth/
+```
+
+## Setup and Execution
+
+To run the program make sure myImage.png is located in the same folder as homework_two.py. Then run:
+
+    python homework_two.py
+
+If the ground truth mask has not already been created the polygon ground truth tool can be used to manually draw the object boundary. To activate the tool uncomment out this code with the main():
+
+    # UNCOMMENT out the line of code below this if you need to make the ground truth
+    # ground_truth_mask, ground_truth_segmented = methods.create_polygon_ground_truth(img, setup)
+
 ## Qualitative Analysis
 
 ### Adaptive Gaussian Thresholding
@@ -31,5 +61,19 @@
 3. Background Noise: If the background noise is similar in color to the unknown figure than this can cause them to be grouped into the same cluster. K-Means does typically handle background noise better than Otsu since its grouping on color similarity rather than just brightness.
 
 4. Color Normalization: Since K-Means uses color to cluster normalization can improve K-Means by making the colors more distinct.
+
+## Quantative Analysis
+
+The segmentation methods were evaluated using Intersection over Union, also called the Jaccard Index, and the Dice Coefficient.
+
+IoU measures the overlap existing between predicted mask and the ground truth mask compared to their combined area.
+
+The Dice Coefficient also measures overlap, but it gives more weight to the shared region between predicted and the ground truth masks. A higher Dice score means better segmentation performance.
+
+# "Need to find a way to add a table to the README here showing the values printed in the code."
+
+## Ground Truth Analysis
+
+The ground truth mask was manually created using a polygon selection around the unknown figure.
 
 ![Segmentation Comparison](generated_images/plots/segmentation_comparison.png)
