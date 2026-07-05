@@ -88,89 +88,117 @@
 
    When I comment out my segment three and segment 5 my segment 4 becomes a different image. Why is that
 
-   2. It told me my code was inefficient and I should have done a loop for each of the clusters. It also told me that I was using a random initialization so I should try PP_CENTERS for a stable center starting point.
+2. It told me my code was inefficient and I should have done a loop for each of the clusters. It also told me that I was using a random initialization so I should try PP_CENTERS for a stable center starting point.
 
-   ## Prompt 11 11:03 6/27/26
+## Prompt 11 11:03 6/27/26
 
-   1. cv.KMEANS_PP_CENTERS What does this do?
+1. cv.KMEANS_PP_CENTERS What does this do?
 
-   2. It told me what I already knew that it decreases the entropy of the clustering.
+2. It told me what I already knew that it decreases the entropy of the clustering.
 
-   ## Prompt 12 11:14 6/27/26
+## Prompt 12 11:14 6/27/26
 
-   1. Part 4: Classical & Optimization-Based Segmentation
-      To handle the complex textures and shadows of the outdoor scene, move beyond simple pixel intensities. Use the fully normalized color image from Part 2 as the input for these methods:
+1. Part 4: Classical & Optimization-Based Segmentation
+   To handle the complex textures and shadows of the outdoor scene, move beyond simple pixel intensities. Use the fully normalized color image from Part 2 as the input for these methods:
 
-   Color-Space Clustering (K-Means):
-   Convert the normalized color image to the HSV color space.
-   Apply K-Means clustering to segment the image into
-   K
-   distinct regions (test and select an optimal
-   K
-   value between 3 and 5).
-   Isolate the cluster that most closely captures the "unknown figure."
-   Save the resulting binary masks and the segmented foreground extractions for both methods.
+Color-Space Clustering (K-Means):
+Convert the normalized color image to the HSV color space.
+Apply K-Means clustering to segment the image into
+K
+distinct regions (test and select an optimal
+K
+value between 3 and 5).
+Isolate the cluster that most closely captures the "unknown figure."
+Save the resulting binary masks and the segmented foreground extractions for both methods.
 
-   2. I went ahead and threw this in because I implemented the code output from the previous recommended code and it was not correct. This was to realign the parameters for the AI to give the type of code I was looking for.
+2. I went ahead and threw this in because I implemented the code output from the previous recommended code and it was not correct. This was to realign the parameters for the AI to give the type of code I was looking for.
 
-   ## Prompt 13 8:03 6/28/26
+## Prompt 13 8:03 6/28/26
 
-   1. What are the pros and cons of adaptive segmentation, otsu, and k-means? Include how each approach is affected by background noise. Also describe how the color normalization affects the final segmentation for all three.
+1. What are the pros and cons of adaptive segmentation, otsu, and k-means? Include how each approach is affected by background noise. Also describe how the color normalization affects the final segmentation for all three.
 
-   2. Gave me an Overview of the pros, cons, effect of background noise, and effect of color normalization for the different techniques.
+2. Gave me an Overview of the pros, cons, effect of background noise, and effect of color normalization for the different techniques.
 
-   ## Prompt 14 8:09 6/28/26
+## Prompt 14 8:09 6/28/26
 
-   1. Small background details may be detected as foreground. The result depends heavily on the parameters, especially the block size and constant value C. Go in further detail on how and why this occurs.
+1. Small background details may be detected as foreground. The result depends heavily on the parameters, especially the block size and constant value C. Go in further detail on how and why this occurs.
 
-   2. Gave me a slightly more in depth discussion on how block size and the value of C affects Adaptive Gaussian Thresholding.
+2. Gave me a slightly more in depth discussion on how block size and the value of C affects Adaptive Gaussian Thresholding.
 
-   ## Prompt 15 9:05 6/28/26
+## Prompt 15 9:05 6/28/26
 
-   1. Does the ground truth need to be done to each of the segmentation process or just to the initial image? What is the purpose of the ground truth since I already know what the object I am trying to detect is.
+1. Does the ground truth need to be done to each of the segmentation process or just to the initial image? What is the purpose of the ground truth since I already know what the object I am trying to detect is.
 
-   2. I was asking to confirm what I already believed was correct this was for further validation. The output was what I expected. The ground truth is done to the intial image and its purpose is to evaluate the differents models performance.
+2. I was asking to confirm what I already believed was correct this was for further validation. The output was what I expected. The ground truth is done to the intial image and its purpose is to evaluate the differents models performance.
 
-   ## Prompt 16 9:11 6/28/26
+## Prompt 16 9:11 6/28/26
 
-   1. In what way would you recommend we automate the ground truth?
+1. In what way would you recommend we automate the ground truth?
 
-   2. It recommended using GrabCut. I implemented the recommended code for GrabCut. This did not work, so I will dive deeper into the code.
+2. It recommended using GrabCut. I implemented the recommended code for GrabCut. This did not work, so I will dive deeper into the code.
 
-   ## Prompt 17 9:23 6/28/26
+## Prompt 17 9:23 6/28/26
 
-   1. I have not used used GrabCut before. Break down each part of the recommended code. Also walk me through how GrabCut works.
+1. I have not used used GrabCut before. Break down each part of the recommended code. Also walk me through how GrabCut works.
 
-   2. I should have just had it discribe the GrabCut library. It broke down everything including the function call.
+2. I should have just had it discribe the GrabCut library. It broke down everything including the function call.
 
-   ## Prompt 18 9:28 6/28/26
+## Prompt 18 9:28 6/28/26
 
-   1. So I need to set the rectangles dimensions manually to include the unknown figure?
+1. So I need to set the rectangles dimensions manually to include the unknown figure?
 
-   2. It confirmed my suspician. It also recommended I use selectROI for determining the rectangle.
+2. It confirmed my suspician. It also recommended I use selectROI for determining the rectangle.
 
-   ## Prompt 19 9:40 6/28/26
+## Prompt 19 9:40 6/28/26
 
-   1. The GrabCut is not determining the unknown figure and is outlining the background noise
+1. The GrabCut is not determining the unknown figure and is outlining the background noise
 
-   ## Prompt 20 10:06 6/28/26
+## Prompt 20 10:06 6/28/26
 
-   1. Skip GrabCut and manually trace the unknown figure as a polygon mask.
+1. Skip GrabCut and manually trace the unknown figure as a polygon mask.
 
-   how would I do this
+how would I do this
 
-   2. It gave me some code to implement to draw the ground truth.
+2. It gave me some code to implement to draw the ground truth.
 
-   ## Prompt 21 10:29 6/28/26
+## Prompt 21 10:29 6/28/26
 
-   1. How to do Part 5 question 2
+1. How to do Part 5 question 2
 
-   2. Gave me some code to implement for making a binary mask and how to calculate the IOU.
+2. Gave me some code to implement for making a binary mask and how to calculate the IOU.
 
-   Then it gave me a function to evaluate the three methods
+Then it gave me a function to evaluate the three methods
 
-   ## Prompt 22 11:14 6/28/26
+## Prompt 22 11:14 6/28/26
 
-   1. How to create the plot in part 5 question 3 for the README?
+1. How to create the plot in part 5 question 3 for the README?
 
-   2. Gave the code for the plot.
+2. Gave the code for the plot.
+
+## Prompt 23 15:10 7/5/26
+
+1. ## Quantitative Segmentation Evaluation
+
+   Otsu Thresholding
+   IoU / Jaccard Index: 0.0263
+   Dice Coefficient: 0.0513
+
+   Adaptive Gaussian Thresholding
+   IoU / Jaccard Index: 0.0564
+   Dice Coefficient: 0.1067
+
+   K-Means HSV Clustering
+   IoU / Jaccard Index: 0.1818
+   Dice Coefficient: 0.3077
+
+   how to add this as a table in the README
+
+2. ## Quantitative Segmentation Evaluation
+
+The segmentation methods were evaluated by comparing each generated mask against the manually created ground truth mask. Two metrics were used: IoU / Jaccard Index and Dice Coefficient. Both scores range from `0` to `1`, where `0` means no overlap and `1` means a perfect match.
+
+| Segmentation Method            | IoU / Jaccard Index | Dice Coefficient |
+| ------------------------------ | ------------------: | ---------------: |
+| Otsu Thresholding              |              0.0263 |           0.0513 |
+| Adaptive Gaussian Thresholding |              0.0564 |           0.1067 |
+| K-Means HSV Clustering         |              0.1818 |           0.3077 |

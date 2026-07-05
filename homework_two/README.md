@@ -70,7 +70,13 @@ IoU measures the overlap existing between predicted mask and the ground truth ma
 
 The Dice Coefficient also measures overlap, but it gives more weight to the shared region between predicted and the ground truth masks. A higher Dice score means better segmentation performance.
 
-# "Need to find a way to add a table to the README here showing the values printed in the code."
+## Quantitative Segmentation Evaluation
+
+| Segmentation Method            | IoU / Jaccard Index | Dice Coefficient |
+| ------------------------------ | ------------------: | ---------------: |
+| Otsu Thresholding              |              0.0263 |           0.0513 |
+| Adaptive Gaussian Thresholding |              0.0564 |           0.1067 |
+| K-Means HSV Clustering         |              0.1818 |           0.3077 |
 
 ## Ground Truth Analysis
 
