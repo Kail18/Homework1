@@ -7,6 +7,8 @@ import random
 import shutil
 from pathlib import Path
 
+## For Homework Three I will seperate these into diffent files and I will do the same for homework 1
+
 
 class DirectorySetup:
     BASE_DIR = Path(__file__).resolve().parent
