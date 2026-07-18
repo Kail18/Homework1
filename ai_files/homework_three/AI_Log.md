@@ -480,6 +480,30 @@ Evaluate the baseline on the untouched test set
 
 provided a script for model_evaluation.py
 
+## Prompt 3 11:54 7/18/2026
+
+**Prompt:**
+
+lets start the optimization of the CNN architecture
+Replace Flatten() with GlobalAveragePooling2D()
+Add Dropout
+Reduce parameter count
+Tune learning rate and batch size
+
+**Response:**
+
+Recommended creating a new optimized_cnn so that we can compare to the baseline model
+
+## Prompt 3 12:52 7/18/2026
+
+**Prompt:**
+
+I provided my current README and had it update the things I was missing.
+
+**Response:**
+
+I used the updated README prompts where needed and rewrote some of the sections to better reflect what I observed.
+
 Template
 
 ## Prompt 3 8:36 7/18/2026

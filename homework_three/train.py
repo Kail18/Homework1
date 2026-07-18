@@ -3,7 +3,7 @@ from pathlib import Path
 import tensorflow as tf
 
 
-def train_baseline_model(
+def train_model(
     model: tf.keras.Model,
     train_dataset: tf.data.Dataset,
     validation_dataset: tf.data.Dataset,
@@ -19,7 +19,7 @@ def train_baseline_model(
     )
 
     checkpoint_path = (
-        output_path / "best_baseline_model.keras"
+        output_path / "best_model.keras"
     )
 
     early_stopping = tf.keras.callbacks.EarlyStopping(
