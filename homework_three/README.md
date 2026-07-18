@@ -380,12 +380,12 @@ The model performs strongest on classes such as Gold and Discuss, which contain 
 
 The following visualization compares baseline and optimized CNN training behavior.
 
-![Training Curve Comparison](![CNN Training Comparison](homework_three/outputs/model_comparison/training_comparison.png))
+![CNN Training Comparison](outputs/model_comparison/training_comparison.png)
 
 # Conclusion
 
-This project demonstrated the complete workflow for developing a CNN-based image classification system, including dataset analysis, preprocessing, augmentation, model development, and evaluation.
+The baseline CNN achieved the strongest classification performance but showed evidence of overfitting due to the gap between training and validation performance. The optimized CNN substantially reduced model complexity through Global Average Pooling and Dropout, decreasing the trainable parameter count from approximately 8.48 million to 101,894. These changes reduced the degree of overfitting, but also reduced overall classification performance, suggesting that the optimized architecture may have been over-regularized or lacked sufficient capacity.
 
-The baseline CNN achieved higher classification accuracy, but showed signs of overfitting due to the limited dataset size. The optimized CNN reduced model complexity through Global Average Pooling and Dropout, producing a model with fewer parameters and improved generalization characteristics.
+Batch-size hyperparameter testing compared configurations of 32 and 64. Batch size 64 achieved the lower validation loss and higher validation accuracy and was therefore selected for the final optimized model. The final optimized model achieved 68.63% test accuracy compared with 83.66% for the baseline model.
 
-The largest limitation of this project is dataset size. With only 711 training images, the model has limited exposure to variations within each fish species. Future improvements would include transfer learning using pretrained architectures, increasing the dataset size, and applying more domain-specific underwater image augmentation techniques.
+The largest limitation of this project is the relatively small and imbalanced dataset. The Cray class, which contains the fewest training examples, remained particularly difficult for the optimized model. Future improvements could include less aggressive Dropout, a larger classification head, class weighting, additional training data, transfer learning with a pretrained CNN, or more targeted domain-specific augmentation.
