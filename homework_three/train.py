@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import tensorflow as tf
+import json
 
 
 def train_model(
@@ -45,5 +46,14 @@ def train_model(
             model_checkpoint,
         ],
     )
+
+    history_path = output_path / "training_history.json"
+
+    with open(history_path, "w") as file:
+        json.dump(
+            history.history,
+            file,
+            indent=4,
+        )
 
     return history

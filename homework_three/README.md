@@ -336,7 +336,7 @@ The model performs strongest on classes such as Gold and Discuss, which contain 
 
 The following visualization compares baseline and optimized CNN training behavior.
 
-![Training Curve Comparison](outputs/model_comparison/training_comparison.png)
+![Training Curve Comparison](![CNN Training Comparison](homework_three/outputs/model_comparison/training_comparison.png))
 
 # Conclusion
 

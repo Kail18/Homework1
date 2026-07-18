@@ -1,5 +1,7 @@
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
+from pathlib import Path
 
 from sklearn.metrics import (
     accuracy_score,
@@ -7,6 +9,7 @@ from sklearn.metrics import (
     recall_score,
     f1_score,
     classification_report,
+    confusion_matrix,
 )
 
 
@@ -14,6 +17,7 @@ def evaluate_model(
     model: tf.keras.Model,
     test_dataset: tf.data.Dataset,
     class_mapping: dict,
+    output_directory: str = "outputs",
 ) -> dict:
     """
     Evaluate a trained model on the untouched test dataset.
@@ -25,6 +29,7 @@ def evaluate_model(
     - Weighted recall
     - Weighted F1-score
     - Classification report
+    - Confusion matrix
 
     Args:
         model:
@@ -36,9 +41,18 @@ def evaluate_model(
         class_mapping:
             Dictionary mapping class names to integer labels.
 
+        output_directory:
+            Directory where evaluation plots are saved.
+
     Returns:
         Dictionary containing evaluation metrics.
     """
+
+    output_path = Path(output_directory)
+    output_path.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
     # Standard Keras test evaluation
     test_loss, test_accuracy = model.evaluate(
@@ -122,7 +136,84 @@ def evaluate_model(
         zero_division=0,
     )
 
-    print("\nBaseline Test Results")
+    # -------------------------------
+    # Generate Confusion Matrix
+    # -------------------------------
+
+    cm = confusion_matrix(
+        true_labels,
+        predicted_labels,
+    )
+
+    plt.figure(
+        figsize=(8, 6)
+    )
+
+    plt.imshow(
+        cm,
+        interpolation="nearest",
+    )
+
+    plt.title(
+        "Optimized CNN Confusion Matrix"
+    )
+
+    plt.colorbar()
+
+    plt.xticks(
+        range(len(class_names)),
+        class_names,
+        rotation=45,
+        ha="right",
+    )
+
+    plt.yticks(
+        range(len(class_names)),
+        class_names,
+    )
+
+    plt.xlabel(
+        "Predicted Class"
+    )
+
+    plt.ylabel(
+        "True Class"
+    )
+
+    # Add values inside cells
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            plt.text(
+                j,
+                i,
+                cm[i, j],
+                ha="center",
+                va="center",
+            )
+
+    plt.tight_layout()
+
+    confusion_matrix_path = (
+        output_path / "confusion_matrix.png"
+    )
+
+    plt.savefig(
+        confusion_matrix_path,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.close()
+
+    print(
+        f"\nConfusion matrix saved to: {confusion_matrix_path}"
+    )
+
+    # -------------------------------
+    # Print Results
+    # -------------------------------
+
+    print("\nTest Results")
     print("---------------------")
     print(f"Test Loss:      {test_loss:.4f}")
     print(f"Test Accuracy:  {accuracy:.4f}")
@@ -143,4 +234,5 @@ def evaluate_model(
         "true_labels": true_labels,
         "predicted_labels": predicted_labels,
         "classification_report": report,
+        "confusion_matrix": cm,
     }
