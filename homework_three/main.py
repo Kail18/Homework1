@@ -4,11 +4,17 @@ from data_details import (
     count_classes, 
     inspect_image_properties,
 )
+from data_split import (
+    create_stratified_split,
+    display_split_summary,
+)
 
 def main():
 
     # Set the data directory path and directory setup
     data_directory = 'homework_three/Fish'
+    split_directory = "homework_three/data/splits"
+
     project_setup.create_homework_three_structure()
 
     # This section is for obtaining the datasets details
@@ -61,6 +67,13 @@ def main():
             )
     else:
         print("No corrupted images found.")
+
+    split_data = create_stratified_split(
+        data_directory=data_directory,
+        output_directory=split_directory,
+    )
+
+    display_split_summary(split_data)
 
 
 if __name__ == "__main__":

@@ -106,5 +106,6 @@ I agree with this assessment. Lets start by creating the stratified/train/valida
 **Prompt:**
 
 It provided a data_split.py file.
+One thing to add it had an output to data/splits as a CSV to help keep the project reproducible. Also the CSV was to prevent data leakage and use for a simplier data loading later.
 
 **Response:**
