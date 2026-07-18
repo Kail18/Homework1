@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 
 IMAGE_HEIGHT = 128
@@ -195,3 +196,67 @@ def create_datasets(
         test_dataset,
         class_mapping,
     )
+
+def visualize_augmentations(
+    train_dataset: tf.data.Dataset,
+    class_mapping: dict,
+    number_of_images: int = 4,
+) -> None:
+    """Display original preprocessed images and augmented versions."""
+
+    augmentation_pipeline = create_augmentation_pipeline()
+
+    # Reverse the class mapping so numeric labels can be
+    # converted back into readable fish class names.
+    reverse_class_mapping = {
+        class_id: class_name
+        for class_name, class_id in class_mapping.items()
+    }
+
+    # Take one batch from the training dataset.
+    for images, labels in train_dataset.take(1):
+
+        number_of_images = min(
+            number_of_images,
+            images.shape[0],
+        )
+
+        figure, axes = plt.subplots(
+            number_of_images,
+            4,
+            figsize=(12, 3 * number_of_images),
+        )
+
+        for row in range(number_of_images):
+            image = images[row]
+            label = int(labels[row].numpy())
+
+            class_name = reverse_class_mapping[label]
+
+            # Column 1: Preprocessed image
+            axes[row, 0].imshow(image)
+            axes[row, 0].set_title(
+                f"Original\n{class_name}"
+            )
+            axes[row, 0].axis("off")
+
+            # Columns 2-4: Different random augmentations
+            for column in range(1, 4):
+
+                augmented_image = augmentation_pipeline(
+                    tf.expand_dims(image, axis=0),
+                    training=True,
+                )
+
+                axes[row, column].imshow(
+                    augmented_image[0]
+                )
+
+                axes[row, column].set_title(
+                    f"Augmented {column}"
+                )
+
+                axes[row, column].axis("off")
+
+        plt.tight_layout()
+        plt.show()

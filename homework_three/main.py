@@ -1,4 +1,6 @@
 import project_setup
+import tensorflow as tf
+
 from data_details import (
     count_file_types, 
     count_classes, 
@@ -9,8 +11,11 @@ from data_split import (
     display_split_summary,
 )
 
-from image_preprocessing import create_datasets
-import tensorflow as tf
+from image_preprocessing import (
+    create_datasets,
+    visualize_augmentations,
+)
+
 
 def main():
 
@@ -90,6 +95,11 @@ def main():
         class_mapping,
     ) = create_datasets(
         split_csv
+    )
+
+    visualize_augmentations(
+        train_dataset,
+        class_mapping,
     )
 
     print("\nClass Mapping")
