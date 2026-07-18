@@ -2,10 +2,11 @@ import project_setup
 import tensorflow as tf
 
 from data_details import (
-    count_file_types, 
-    count_classes, 
+    count_file_types,
+    count_classes,
     inspect_image_properties,
 )
+
 from data_split import (
     create_stratified_split,
     display_split_summary,
@@ -24,64 +25,100 @@ from model import (
 
 from train import train_model
 
-from training_visualization import plot_training_history
+from training_visualization import (
+    plot_training_history,
+)
 
-from model_evaluation import evaluate_model
+from model_evaluation import (
+    evaluate_model,
+)
 
 from optimized_cnn import (
     build_optimized_cnn,
     compile_optimized_cnn,
 )
 
+
 def main():
 
     # Set the data directory path and directory setup
-    data_directory = 'homework_three/Fish'
+    data_directory = "homework_three/Fish"
     split_directory = "homework_three/data/splits"
 
     project_setup.create_homework_three_structure()
 
-    # This section is for obtaining the datasets details
+    # =============================================
+    # Dataset Details
+    # =============================================
 
-    file_counts = count_file_types(data_directory)
+    file_counts = count_file_types(
+        data_directory
+    )
 
     print("\nDataset File Types")
     print("------------------")
 
     for file_type, count in file_counts.items():
-        print(f"{file_type}: {count}")
+        print(
+            f"{file_type}: {count}"
+        )
 
-    class_counts = count_classes(data_directory)
+    class_counts = count_classes(
+        data_directory
+    )
 
     print("\nFish Classes")
     print("------------")
 
     for class_name, count in class_counts.items():
-        print(f"{class_name}: {count}")
+        print(
+            f"{class_name}: {count}"
+        )
 
-    total_images = sum(class_counts.values())
+    total_images = sum(
+        class_counts.values()
+    )
 
-    print(f"\nTotal Classes: {len(class_counts)}")
-    print(f"Total Images: {total_images}")
+    print(
+        f"\nTotal Classes: {len(class_counts)}"
+    )
 
-    image_properties = inspect_image_properties(data_directory)
+    print(
+        f"Total Images: {total_images}"
+    )
+
+    image_properties = inspect_image_properties(
+        data_directory
+    )
 
     print("\nImage Dimensions")
     print("----------------")
 
-    for dimensions, count in image_properties["dimensions"].items():
-        print(f"{dimensions[0]} x {dimensions[1]}: {count}")
+    for dimensions, count in image_properties[
+        "dimensions"
+    ].items():
+        print(
+            f"{dimensions[0]} x "
+            f"{dimensions[1]}: "
+            f"{count}"
+        )
 
     print("\nColor Modes")
     print("-----------")
 
-    for color_mode, count in image_properties["color_modes"].items():
-        print(f"{color_mode}: {count}")
+    for color_mode, count in image_properties[
+        "color_modes"
+    ].items():
+        print(
+            f"{color_mode}: {count}"
+        )
 
     print("\nCorrupted Images")
     print("----------------")
 
-    corrupted_images = image_properties["corrupted_images"]
+    corrupted_images = image_properties[
+        "corrupted_images"
+    ]
 
     if corrupted_images:
         for corrupted_image in corrupted_images:
@@ -90,14 +127,22 @@ def main():
                 f"{corrupted_image['error']}"
             )
     else:
-        print("No corrupted images found.")
+        print(
+            "No corrupted images found."
+        )
+
+    # =============================================
+    # Create Stratified Dataset Split
+    # =============================================
 
     split_data = create_stratified_split(
         data_directory=data_directory,
         output_directory=split_directory,
     )
 
-    display_split_summary(split_data)
+    display_split_summary(
+        split_data
+    )
 
     split_csv = (
         "homework_three/data/splits/"
@@ -117,47 +162,58 @@ def main():
         class_mapping
     )
 
-    # baseline_model = build_baseline_cnn(
-    #     number_of_classes
-    # )
+    # =============================================
+    # Baseline CNN
+    # =============================================
 
-    # baseline_model = compile_baseline_cnn(
-    #     baseline_model
-    # )
+    baseline_model = build_baseline_cnn(
+        number_of_classes
+    )
 
-    # baseline_model.summary()
+    baseline_model = compile_baseline_cnn(
+        baseline_model
+    )
 
-    # baseline_output_directory = (
-    #     "homework_three/outputs/baseline"
-    # )
-    
+    baseline_model.summary()
 
-    # # Train baseline only once
-    # history = train_baseline_model(
-    #     model=baseline_model,
-    #     train_dataset=train_dataset,
-    #     validation_dataset=validation_dataset,
-    #     output_directory=baseline_output_directory,
-    #     epochs=30,
-    # )
+    baseline_output_directory = (
+        "homework_three/outputs/baseline"
+    )
 
-    # # Plot the history from that same training run
-    # plot_training_history(
-    #     history=history,
-    #     output_directory=baseline_output_directory,
-    # )
+    # Train baseline model
+    baseline_history = train_model(
+        model=baseline_model,
+        train_dataset=train_dataset,
+        validation_dataset=validation_dataset,
+        output_directory=baseline_output_directory,
+        epochs=30,
+    )
 
-    # # Load the best saved model
-    # saved_model = load_saved_model(
-    #     "homework_three/outputs/baseline/best_baseline_model.keras"
-    # )
+    # Plot baseline training history
+    plot_training_history(
+        history=baseline_history,
+        output_directory=baseline_output_directory,
+        model_name="Baseline CNN",
+    )
 
-    # # Evaluate the best saved model on the untouched test set
-    # baseline_results = evaluate_model(
-    #     model=saved_model,
-    #     test_dataset=test_dataset,
-    #     class_mapping=class_mapping,
-    # )
+    # Load best baseline checkpoint
+    saved_baseline_model = load_saved_model(
+        "homework_three/outputs/baseline/"
+        "best_model.keras"
+    )
+
+    # Evaluate baseline on untouched test set
+    baseline_results = evaluate_model(
+        model=saved_baseline_model,
+        test_dataset=test_dataset,
+        class_mapping=class_mapping,
+        output_directory=baseline_output_directory,
+        model_name="Baseline CNN",
+    )
+
+    # =============================================
+    # Optimized CNN
+    # =============================================
 
     optimized_model = build_optimized_cnn(
         number_of_classes
@@ -169,12 +225,11 @@ def main():
 
     optimized_model.summary()
 
-
     optimized_output_directory = (
         "homework_three/outputs/optimized"
     )
 
-
+    # Train optimized model
     optimized_history = train_model(
         model=optimized_model,
         train_dataset=train_dataset,
@@ -183,36 +238,40 @@ def main():
         epochs=30,
     )
 
-
+    # Plot optimized training history
     plot_training_history(
         history=optimized_history,
         output_directory=optimized_output_directory,
+        model_name="Optimized CNN",
     )
 
-
-    optimized_model_path = (
-        "homework_three/outputs/optimized/"
-        "best_optimized_model.keras"
-    )
-
-
+    # Load best optimized checkpoint
     saved_optimized_model = load_saved_model(
-        optimized_model_path
+        "homework_three/outputs/optimized/"
+        "best_model.keras"
     )
 
-
+    # Evaluate optimized model on untouched test set
     optimized_results = evaluate_model(
         model=saved_optimized_model,
         test_dataset=test_dataset,
         class_mapping=class_mapping,
+        output_directory=optimized_output_directory,
+        model_name="Optimized CNN",
     )
 
-    # Uncomment this section to visualize the augmentations applied to the training dataset.
+    # =============================================
+    # Optional Augmentation Visualization
+    # =============================================
 
     # visualize_augmentations(
     #     train_dataset,
     #     class_mapping,
     # )
+
+    # =============================================
+    # Class Mapping
+    # =============================================
 
     print("\nClass Mapping")
     print("-------------")
@@ -222,20 +281,33 @@ def main():
             f"{class_name}: {class_id}"
         )
 
+    # =============================================
+    # Optional Batch Validation
+    # =============================================
+
     # for images, labels in train_dataset.take(1):
+    #
     #     print("\nTraining Batch")
     #     print("--------------")
+    #
     #     print(
-    #         f"Image batch shape: {images.shape}"
+    #         f"Image batch shape: "
+    #         f"{images.shape}"
     #     )
+    #
     #     print(
-    #         f"Label batch shape: {labels.shape}"
+    #         f"Label batch shape: "
+    #         f"{labels.shape}"
     #     )
+    #
     #     print(
-    #         f"Minimum pixel value: {tf.reduce_min(images).numpy():.4f}"
+    #         f"Minimum pixel value: "
+    #         f"{tf.reduce_min(images).numpy():.4f}"
     #     )
+    #
     #     print(
-    #         f"Maximum pixel value: {tf.reduce_max(images).numpy():.4f}"
+    #         f"Maximum pixel value: "
+    #         f"{tf.reduce_max(images).numpy():.4f}"
     #     )
 
 

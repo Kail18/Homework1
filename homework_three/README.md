@@ -2,19 +2,23 @@
 
 ## Project Overview
 
-This project focuses on building and evaluating a Convolutional Neural Network (CNN) for multiclass fish image classification.
+This project focuses on building, optimizing, and evaluating Convolutional Neural Networks (CNNs) for multiclass fish image classification.
 
-The current work completed includes:
+The completed workflow includes:
 
 - Project directory setup
 - Dataset inspection and validation
 - Stratified train/validation/test splitting
-- Image preprocessing
+- Image preprocessing and normalization
 - Class label mapping
 - Training data augmentation
-- Augmentation visualization
-
-The next major step will be building and training the baseline CNN.
+- Baseline CNN development and evaluation
+- Optimized CNN development and evaluation
+- Early stopping and model checkpointing
+- Quantitative evaluation using accuracy, precision, recall, and F1-score
+- Per-class classification reports
+- Confusion matrix analysis
+- Training and validation curve comparison
 
 ---
 
@@ -169,6 +173,14 @@ The goal is to improve model generalization by reducing the likelihood that the 
 Validation and test images are not randomly augmented.
 This ensures that model performance is measured using consistent, unmodified evaluation data.
 
+### Data Augmentation Analysis
+
+Random horizontal flipping, small rotations, and random contrast adjustments were applied only during training. These augmentations introduced variation in fish orientation and image appearance without modifying the validation or test datasets.
+
+The purpose of these transformations was to reduce the model's dependence on specific image orientations and lighting conditions. Training accuracy fluctuated more when augmentation and Dropout were active in the optimized model because the model received slightly different transformed images during each epoch. However, these transformations also made memorization more difficult and contributed to the smaller gap observed between training and validation accuracy.
+
+The augmentation pipeline was intentionally kept moderate. Large rotations or aggressive transformations were avoided because they could produce unrealistic fish orientations or distort class-specific visual features.
+
 ## Baseline Model
 
 ### Baseline CNN Hyperparameters
@@ -219,22 +231,22 @@ The model checkpoint monitored validation loss and preserved the model from the 
 
 | Metric        |  Score |
 | ------------- | -----: |
-| Test Loss     | 0.8278 |
-| Test Accuracy | 81.05% |
-| Precision     | 81.90% |
-| Recall        | 81.05% |
-| F1-Score      | 81.08% |
+| Test Loss     | 0.6539 |
+| Test Accuracy | 83.66% |
+| Precision     | 84.88% |
+| Recall        | 83.66% |
+| F1-Score      | 82.96% |
 
-#### Baseline Class Perfomance
+#### Baseline Class Performance
 
 | Class   | Precision | Recall | F1-Score |
 | ------- | --------: | -----: | -------: |
-| Bete    |      0.75 |   0.83 |     0.79 |
-| Cray    |      0.70 |   0.58 |     0.64 |
-| Discuss |      0.96 |   0.83 |     0.89 |
-| Gold    |      0.93 |   0.87 |     0.90 |
-| Guppy   |      0.72 |   0.90 |     0.80 |
-| Oscar   |      0.75 |   0.68 |     0.71 |
+| Bete    |      0.78 |   0.86 |     0.82 |
+| Cray    |      0.80 |   0.33 |     0.47 |
+| Discuss |      0.90 |   0.93 |     0.92 |
+| Gold    |      1.00 |   0.84 |     0.91 |
+| Guppy   |      0.72 |   0.97 |     0.82 |
+| Oscar   |      0.85 |   0.77 |     0.81 |
 
 ### Hyperparameter optimization / Improve CNN architecture
 
@@ -287,40 +299,55 @@ The following modifications were applied:
 
 ## Optimized Model Training Analysis
 
-The optimized CNN demonstrated improved generalization compared to the baseline model.
+The optimized CNN was designed to reduce the overfitting observed in the baseline model by replacing the large Flatten-based classification head with GlobalAveragePooling2D, reducing the dense layer size, and adding Dropout regularization.
 
-The addition of dropout and global average pooling reduced the number of trainable parameters while maintaining feature extraction capability. The model achieved similar training accuracy while producing more stable validation performance.
+These changes substantially reduced the model from approximately 8.48 million trainable parameters to 101,894 trainable parameters.
 
-Unlike the baseline model, the optimized model showed a smaller gap between training and validation accuracy, indicating reduced overfitting.
+The optimized model showed a much smaller gap between training and validation accuracy than the baseline model, indicating that overfitting was reduced. However, both training and validation accuracy remained substantially lower than those of the baseline model. This suggests that the optimized architecture may have been over-regularized or lacked sufficient capacity to learn all of the discriminative features required for the six fish classes.
 
-The model achieved its best validation performance near epoch 24 before early stopping terminated training. The checkpointed model from this epoch was used for final test evaluation.
+The lowest validation loss was achieved at epoch 20. Training continued until epoch 25, when early stopping was triggered, and the model weights from epoch 20 were restored.
+
+Although the optimized architecture successfully reduced model complexity and overfitting, it did not improve performance on the held-out test dataset.
 
 ### Optimized Training Results
 
-| Metric               |   Score |
-| -------------------- | ------: |
-| Training Accuracy    |    ~69% |
-| Validation Accuracy  | ~66-67% |
-| Test Accuracy        |  73.86% |
-| Precision            |  70.39% |
-| Recall               |  73.86% |
-| F1-Score             |  71.19% |
-| Trainable Parameters | 101,894 |
+| Metric                    |   Score |
+| ------------------------- | ------: |
+| Final Training Accuracy   | ~64.56% |
+| Final Validation Accuracy | ~63.16% |
+| Test Accuracy             |  66.01% |
+| Precision                 |  68.33% |
+| Recall                    |  66.01% |
+| F1-Score                  |  66.28% |
+| Trainable Parameters      | 101,894 |
+
+#### Optimized Class Performance
+
+| Class   | Precision | Recall | F1-Score |
+| ------- | --------: | -----: | -------: |
+| Bete    |      0.80 |   0.55 |     0.65 |
+| Cray    |      0.17 |   0.17 |     0.17 |
+| Discuss |      0.96 |   0.90 |     0.93 |
+| Gold    |      0.85 |   0.90 |     0.88 |
+| Guppy   |      0.45 |   0.66 |     0.54 |
+| Oscar   |      0.50 |   0.41 |     0.45 |
 
 ## Baseline vs Optimized Model Comparison
 
 | Model         | Test Accuracy | Precision | Recall | F1-Score |
 | ------------- | ------------: | --------: | -----: | -------: |
-| Baseline CNN  |        81.05% |    81.90% | 81.05% |   81.08% |
-| Optimized CNN |        73.86% |    70.39% | 73.86% |   71.19% |
+| Baseline CNN  |        83.66% |    84.88% | 83.66% |   82.96% |
+| Optimized CNN |        66.01% |    68.33% | 66.01% |   66.28% |
 
 ### Comparison Discussion
 
-The optimized CNN reduced model complexity and improved resistance to overfitting; however, it did not outperform the baseline model on the held-out test set.
+The optimized CNN substantially reduced model complexity and showed less separation between training and validation performance, indicating that the regularization techniques were effective at reducing overfitting. However, this improvement came at the cost of classification performance.
 
-The baseline model achieved higher classification performance because the dataset contained enough visual information for the larger network to memorize useful features. However, the baseline model showed stronger signs of overfitting due to the large difference between training and validation performance.
+The baseline CNN achieved the strongest held-out test results, with 83.66% accuracy and an F1-score of 82.96%, compared with 66.01% accuracy and a 66.28% F1-score for the optimized model.
 
-The optimized model achieved a better balance between model complexity and generalization. Future improvements would likely require additional training data, transfer learning, or more targeted augmentation rather than increasing model capacity.
+The results suggest that replacing the large Flatten-based classification head with GlobalAveragePooling2D, reducing the dense layer size, and applying two Dropout layers may have reduced model capacity too aggressively. The optimized model appears to have shifted from an overfitting problem toward an underfitting problem.
+
+The baseline therefore remains the better-performing model for this dataset, although its training curves indicate that additional regularization could still improve its generalization. A future model could use a less aggressive combination of regularization techniques, such as lower Dropout rates or a larger dense classification layer.
 
 ## Optimized CNN Confusion Matrix
 
@@ -328,7 +355,7 @@ The confusion matrix below shows the classification performance of the optimized
 
 ![Optimized CNN Confusion Matrix](outputs/optimized/confusion_matrix.png)
 
-The confusion matrix shows that the Cray class remains the most difficult class for the model to classify. This is expected because Cray contains the fewest training examples, making it more difficult for the CNN to learn robust visual features.
+The Cray class was the most difficult class for the optimized model, achieving a precision and recall of only 0.17. Cray also contains the fewest images in the dataset, with only 56 training examples, which may contribute to this poor performance. Visual similarities between Cray and other classes may also contribute to classification errors.
 
 The model performs strongest on classes such as Gold and Discuss, which contain more training examples and have more visually distinctive characteristics.
 

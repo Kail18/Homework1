@@ -46,125 +46,170 @@ def plot_training_comparison():
     )
 
 
-    figure, axes = plt.subplots(
-        2,
-        2,
-        figsize=(14,10)
+    figure = plt.figure(
+        figsize=(14,14)
     )
+
+    grid = figure.add_gridspec(
+        3,
+        2
+    )
+
+    ax1 = figure.add_subplot(grid[0,0])
+    ax2 = figure.add_subplot(grid[0,1])
+    ax3 = figure.add_subplot(grid[1,0])
+    ax4 = figure.add_subplot(grid[1,1])
+    ax5 = figure.add_subplot(grid[2,:])
 
 
     # Baseline Accuracy
 
-    axes[0,0].plot(
+    ax1.plot(
         baseline["accuracy"],
         label="Training"
     )
 
-    axes[0,0].plot(
+    ax1.plot(
         baseline["val_accuracy"],
         label="Validation"
     )
 
-    axes[0,0].set_title(
+    ax1.set_title(
         "Baseline CNN Accuracy"
     )
 
-    axes[0,0].set_xlabel(
+    ax1.set_xlabel(
         "Epoch"
     )
 
-    axes[0,0].set_ylabel(
+    ax1.set_ylabel(
         "Accuracy"
     )
 
-    axes[0,0].legend()
+    ax1.legend()
 
 
 
     # Baseline Loss
 
-    axes[0,1].plot(
+    ax2.plot(
         baseline["loss"],
         label="Training"
     )
 
-    axes[0,1].plot(
+    ax2.plot(
         baseline["val_loss"],
         label="Validation"
     )
 
 
-    axes[0,1].set_title(
+    ax2.set_title(
         "Baseline CNN Loss"
     )
 
-    axes[0,1].set_xlabel(
+    ax2.set_xlabel(
         "Epoch"
     )
 
-    axes[0,1].set_ylabel(
+    ax2.set_ylabel(
         "Loss"
     )
 
-    axes[0,1].legend()
+    ax2.legend()
 
 
 
     # Optimized Accuracy
 
-    axes[1,0].plot(
+    ax3.plot(
         optimized["accuracy"],
         label="Training"
     )
 
-    axes[1,0].plot(
+    ax3.plot(
         optimized["val_accuracy"],
         label="Validation"
     )
 
 
-    axes[1,0].set_title(
+    ax3.set_title(
         "Optimized CNN Accuracy"
     )
 
-    axes[1,0].set_xlabel(
+    ax3.set_xlabel(
         "Epoch"
     )
 
-    axes[1,0].set_ylabel(
+    ax3.set_ylabel(
         "Accuracy"
     )
 
-    axes[1,0].legend()
+    ax3.legend()
 
 
 
     # Optimized Loss
 
-    axes[1,1].plot(
+    ax4.plot(
         optimized["loss"],
         label="Training"
     )
 
-    axes[1,1].plot(
+    ax4.plot(
         optimized["val_loss"],
         label="Validation"
     )
 
 
-    axes[1,1].set_title(
+    ax4.set_title(
         "Optimized CNN Loss"
     )
 
-    axes[1,1].set_xlabel(
+    ax4.set_xlabel(
         "Epoch"
     )
 
-    axes[1,1].set_ylabel(
+    ax4.set_ylabel(
         "Loss"
     )
 
-    axes[1,1].legend()
+    ax4.legend()
+
+    true_labels = np.load(
+        "homework_three/outputs/optimized/true_labels.npy"
+    )
+
+    predicted_labels = np.load(
+        "homework_three/outputs/optimized/predicted_labels.npy"
+    )
+
+
+    cm = confusion_matrix(
+        true_labels,
+        predicted_labels
+    )
+
+
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        ax=ax5,
+        cmap="Blues"
+    )
+
+
+    ax5.set_title(
+        "Optimized CNN Confusion Matrix"
+    )
+
+    ax5.set_xlabel(
+        "Predicted Class"
+    )
+
+    ax5.set_ylabel(
+        "True Class"
+    )
 
 
     plt.tight_layout()

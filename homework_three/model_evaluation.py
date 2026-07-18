@@ -18,6 +18,7 @@ def evaluate_model(
     test_dataset: tf.data.Dataset,
     class_mapping: dict,
     output_directory: str = "outputs",
+    model_name: str = "CNN",
 ) -> dict:
     """
     Evaluate a trained model on the untouched test dataset.
@@ -155,7 +156,7 @@ def evaluate_model(
     )
 
     plt.title(
-        "Optimized CNN Confusion Matrix"
+        f"{model_name} Confusion Matrix"
     )
 
     plt.colorbar()
@@ -202,6 +203,21 @@ def evaluate_model(
         dpi=300,
         bbox_inches="tight",
     )
+
+
+    # Save labels for comparison visualization
+    np.save(
+        output_path / "true_labels.npy",
+        true_labels,
+    )
+
+    np.save(
+        output_path / "predicted_labels.npy",
+        predicted_labels,
+    )
+
+
+    plt.close()
 
     plt.close()
 
