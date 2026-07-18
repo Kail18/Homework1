@@ -16,6 +16,18 @@ from image_preprocessing import (
     visualize_augmentations,
 )
 
+from model import (
+    build_baseline_cnn,
+    compile_baseline_cnn,
+    load_saved_model,
+)
+
+from train import train_baseline_model
+
+from training_visualization import plot_training_history
+
+from model_evaluation import evaluate_model
+
 
 def main():
 
@@ -97,10 +109,56 @@ def main():
         split_csv
     )
 
-    visualize_augmentations(
-        train_dataset,
-        class_mapping,
+    number_of_classes = len(
+        class_mapping
     )
+
+    baseline_model = build_baseline_cnn(
+        number_of_classes
+    )
+
+    baseline_model = compile_baseline_cnn(
+        baseline_model
+    )
+
+    baseline_model.summary()
+
+    baseline_output_directory = (
+        "homework_three/outputs/baseline"
+    )
+
+    # Train baseline only once
+    history = train_baseline_model(
+        model=baseline_model,
+        train_dataset=train_dataset,
+        validation_dataset=validation_dataset,
+        output_directory=baseline_output_directory,
+        epochs=30,
+    )
+
+    # Plot the history from that same training run
+    plot_training_history(
+        history=history,
+        output_directory=baseline_output_directory,
+    )
+
+    # Load the best saved model
+    saved_model = load_saved_model(
+        "homework_three/outputs/baseline/best_baseline_model.keras"
+    )
+
+    # Evaluate the best saved model on the untouched test set
+    baseline_results = evaluate_model(
+        model=saved_model,
+        test_dataset=test_dataset,
+        class_mapping=class_mapping,
+    )
+    # Uncomment this section to visualize the augmentations applied to the training dataset.
+
+    # visualize_augmentations(
+    #     train_dataset,
+    #     class_mapping,
+    # )
 
     print("\nClass Mapping")
     print("-------------")

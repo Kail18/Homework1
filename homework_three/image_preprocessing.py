@@ -248,8 +248,14 @@ def visualize_augmentations(
                     training=True,
                 )
 
+                clipped_image = tf.clip_by_value(
+                    augmented_image[0],
+                    0.0,
+                    1.0,
+                )
+
                 axes[row, column].imshow(
-                    augmented_image[0]
+                    clipped_image
                 )
 
                 axes[row, column].set_title(

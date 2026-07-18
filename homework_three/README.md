@@ -136,6 +136,8 @@ The final image tensor shape is:
 128 x 128 x 3
 ```
 
+Will consider 224 x 224 if the initial model struggles to distinguish visually similar species. In lecture we discussed trying to use lower resolutions during the early HPO to reduce computational cost.
+
 For a batch size of 32, the CNN receives image batches with the shape:
 
 ```text
@@ -166,3 +168,70 @@ These transformations introduce controlled variation into the training dataset.
 The goal is to improve model generalization by reducing the likelihood that the CNN memorizes specific orientations, lighting conditions, or image characteristics.
 Validation and test images are not randomly augmented.
 This ensures that model performance is measured using consistent, unmodified evaluation data.
+
+## Baseline Model
+
+## Baseline CNN Hyperparameters
+
+| Hyperparameter          | Value                              |
+| ----------------------- | ---------------------------------- |
+| Input Image Size        | `128 x 128 x 3`                    |
+| Batch Size              | `32`                               |
+| Maximum Epochs          | `30`                               |
+| Optimizer               | `Adam`                             |
+| Learning Rate           | `0.001`                            |
+| Loss Function           | `Sparse Categorical Cross-Entropy` |
+| Number of Classes       | `6`                                |
+| Conv Layer 1 Filters    | `32`                               |
+| Conv Layer 2 Filters    | `64`                               |
+| Conv Layer 3 Filters    | `128`                              |
+| Convolution Kernel Size | `3 x 3`                            |
+| Padding                 | `same`                             |
+| Activation Function     | `ReLU`                             |
+| Max Pool Size           | `2 x 2`                            |
+| Dense Layer Units       | `256`                              |
+| Output Activation       | `Softmax`                          |
+| Early Stopping Monitor  | `val_loss`                         |
+| Early Stopping Patience | `5` epochs                         |
+| Restore Best Weights    | `True`                             |
+| Checkpoint Monitor      | `val_loss`                         |
+| Save Best Model Only    | `True`                             |
+| Random Seed             | `42`                               |
+| Training Split          | `70%`                              |
+| Validation Split        | `15%`                              |
+| Test Split              | `15%`                              |
+| Image Normalization     | `[0, 1]`                           |
+| Horizontal Flip         | `Enabled`                          |
+| Random Rotation         | `0.05`                             |
+| Random Contrast         | `0.20`                             |
+
+### Baseline Training Analysis
+
+The baseline CNN showed strong learning performance on the training dataset. Training accuracy steadily increased to approximately 98%, while training loss decreased to approximately 0.06.
+
+Validation performance initially improved, reaching approximately 85–86% accuracy. However, validation accuracy eventually plateaued and declined while validation loss began to increase. This divergence between training and validation performance indicates overfitting.
+
+The model checkpoint monitored validation loss and preserved the model from the epoch with the best validation performance rather than using the final training epoch. These results suggest that the baseline model has excessive capacity relative to the dataset size and may benefit from additional regularization, dropout, or reduced model complexity.
+
+### Baseline Model Results
+
+#### Baseline Metrics
+
+| Metric        |  Score |
+| ------------- | -----: |
+| Test Loss     | 0.8278 |
+| Test Accuracy | 81.05% |
+| Precision     | 81.90% |
+| Recall        | 81.05% |
+| F1-Score      | 81.08% |
+
+#### Baseline Class Perfomance
+
+| Class   | Precision | Recall | F1-Score |
+| ------- | --------: | -----: | -------: |
+| Bete    |      0.75 |   0.83 |     0.79 |
+| Cray    |      0.70 |   0.58 |     0.64 |
+| Discuss |      0.96 |   0.83 |     0.89 |
+| Gold    |      0.93 |   0.87 |     0.90 |
+| Guppy   |      0.72 |   0.90 |     0.80 |
+| Oscar   |      0.75 |   0.68 |     0.71 |
