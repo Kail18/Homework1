@@ -41,9 +41,15 @@ from optimized_cnn import (
 
 def main():
 
-    # Set the data directory path and directory setup
+    # =============================================
+    # Project and Dataset Paths
+    # =============================================
+
     data_directory = "homework_three/Fish"
-    split_directory = "homework_three/data/splits"
+
+    split_directory = (
+        "homework_three/data/splits"
+    )
 
     project_setup.create_homework_three_structure()
 
@@ -80,11 +86,13 @@ def main():
     )
 
     print(
-        f"\nTotal Classes: {len(class_counts)}"
+        f"\nTotal Classes: "
+        f"{len(class_counts)}"
     )
 
     print(
-        f"Total Images: {total_images}"
+        f"Total Images: "
+        f"{total_images}"
     )
 
     image_properties = inspect_image_properties(
@@ -97,6 +105,7 @@ def main():
     for dimensions, count in image_properties[
         "dimensions"
     ].items():
+
         print(
             f"{dimensions[0]} x "
             f"{dimensions[1]}: "
@@ -109,8 +118,10 @@ def main():
     for color_mode, count in image_properties[
         "color_modes"
     ].items():
+
         print(
-            f"{color_mode}: {count}"
+            f"{color_mode}: "
+            f"{count}"
         )
 
     print("\nCorrupted Images")
@@ -121,12 +132,16 @@ def main():
     ]
 
     if corrupted_images:
+
         for corrupted_image in corrupted_images:
+
             print(
                 f"{corrupted_image['file']}: "
                 f"{corrupted_image['error']}"
             )
+
     else:
+
         print(
             "No corrupted images found."
         )
@@ -149,13 +164,19 @@ def main():
         "dataset_splits.csv"
     )
 
+    # =============================================
+    # Create Default Datasets
+    # Baseline uses batch size 32
+    # =============================================
+
     (
         train_dataset,
         validation_dataset,
         test_dataset,
         class_mapping,
     ) = create_datasets(
-        split_csv
+        split_csv,
+        batch_size=32,
     )
 
     number_of_classes = len(
@@ -165,6 +186,10 @@ def main():
     # =============================================
     # Baseline CNN
     # =============================================
+
+    tf.keras.utils.set_random_seed(
+        42
+    )
 
     baseline_model = build_baseline_cnn(
         number_of_classes
@@ -202,7 +227,7 @@ def main():
         "best_model.keras"
     )
 
-    # Evaluate baseline on untouched test set
+    # Evaluate baseline model on untouched test set
     baseline_results = evaluate_model(
         model=saved_baseline_model,
         test_dataset=test_dataset,
@@ -212,8 +237,169 @@ def main():
     )
 
     # =============================================
-    # Optimized CNN
+    # Batch Size Hyperparameter Optimization
+    # Test batch sizes 32 and 64
     # =============================================
+
+    batch_sizes = [
+        32,
+        64,
+    ]
+
+    batch_size_results = {}
+
+    for batch_size in batch_sizes:
+
+        print(
+            "\n============================================="
+        )
+
+        print(
+            f"Testing Optimized CNN "
+            f"with Batch Size: {batch_size}"
+        )
+
+        print(
+            "============================================="
+        )
+
+        (
+            experiment_train_dataset,
+            experiment_validation_dataset,
+            _,
+            _,
+        ) = create_datasets(
+            split_csv,
+            batch_size=batch_size,
+        )
+
+        # Reset random seed so both experiments
+        # begin from the same reproducible seed.
+        tf.keras.utils.set_random_seed(
+            42
+        )
+
+        experiment_model = build_optimized_cnn(
+            number_of_classes
+        )
+
+        experiment_model = compile_optimized_cnn(
+            experiment_model
+        )
+
+        experiment_output_directory = (
+            "homework_three/outputs/hpo/"
+            f"batch_size_{batch_size}"
+        )
+
+        experiment_history = train_model(
+            model=experiment_model,
+            train_dataset=experiment_train_dataset,
+            validation_dataset=experiment_validation_dataset,
+            output_directory=experiment_output_directory,
+            epochs=30,
+        )
+
+        best_validation_loss = min(
+            experiment_history.history[
+                "val_loss"
+            ]
+        )
+
+        best_validation_accuracy = max(
+            experiment_history.history[
+                "val_accuracy"
+            ]
+        )
+
+        batch_size_results[
+            batch_size
+        ] = {
+            "best_val_loss":
+                best_validation_loss,
+
+            "best_val_accuracy":
+                best_validation_accuracy,
+        }
+
+    # =============================================
+    # Display Batch Size HPO Results
+    # =============================================
+
+    print(
+        "\nBatch Size HPO Results"
+    )
+
+    print(
+        "----------------------"
+    )
+
+    for (
+        batch_size,
+        results,
+    ) in batch_size_results.items():
+
+        print(
+            f"\nBatch Size: "
+            f"{batch_size}"
+        )
+
+        print(
+            f"Best Validation Loss: "
+            f"{results['best_val_loss']:.4f}"
+        )
+
+        print(
+            f"Best Validation Accuracy: "
+            f"{results['best_val_accuracy']:.4f}"
+        )
+
+    # Select the batch size with
+    # the lowest validation loss.
+    best_batch_size = min(
+        batch_size_results,
+        key=lambda batch_size:
+            batch_size_results[
+                batch_size
+            ][
+                "best_val_loss"
+            ],
+    )
+
+    print(
+        "\nSelected Batch Size"
+    )
+
+    print(
+        "-------------------"
+    )
+
+    print(
+        f"Best Batch Size: "
+        f"{best_batch_size}"
+    )
+
+    # =============================================
+    # Create Final Optimized Datasets
+    # =============================================
+
+    (
+        optimized_train_dataset,
+        optimized_validation_dataset,
+        optimized_test_dataset,
+        optimized_class_mapping,
+    ) = create_datasets(
+        split_csv,
+        batch_size=best_batch_size,
+    )
+
+    # =============================================
+    # Final Optimized CNN
+    # =============================================
+
+    tf.keras.utils.set_random_seed(
+        42
+    )
 
     optimized_model = build_optimized_cnn(
         number_of_classes
@@ -229,11 +415,12 @@ def main():
         "homework_three/outputs/optimized"
     )
 
-    # Train optimized model
+    # Train optimized model using
+    # selected batch size.
     optimized_history = train_model(
         model=optimized_model,
-        train_dataset=train_dataset,
-        validation_dataset=validation_dataset,
+        train_dataset=optimized_train_dataset,
+        validation_dataset=optimized_validation_dataset,
         output_directory=optimized_output_directory,
         epochs=30,
     )
@@ -251,11 +438,12 @@ def main():
         "best_model.keras"
     )
 
-    # Evaluate optimized model on untouched test set
+    # Evaluate final optimized model
+    # on untouched test dataset.
     optimized_results = evaluate_model(
         model=saved_optimized_model,
-        test_dataset=test_dataset,
-        class_mapping=class_mapping,
+        test_dataset=optimized_test_dataset,
+        class_mapping=optimized_class_mapping,
         output_directory=optimized_output_directory,
         model_name="Optimized CNN",
     )
@@ -273,12 +461,22 @@ def main():
     # Class Mapping
     # =============================================
 
-    print("\nClass Mapping")
-    print("-------------")
+    print(
+        "\nClass Mapping"
+    )
 
-    for class_name, class_id in class_mapping.items():
+    print(
+        "-------------"
+    )
+
+    for (
+        class_name,
+        class_id,
+    ) in class_mapping.items():
+
         print(
-            f"{class_name}: {class_id}"
+            f"{class_name}: "
+            f"{class_id}"
         )
 
     # =============================================

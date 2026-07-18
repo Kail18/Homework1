@@ -54,3 +54,11 @@ python homework_one.py
 In the terminal in homework_two directory
 
 python homework_two.py
+
+### Homework 3
+
+In the terminal in homework_three directory
+
+```text
+python main.py
+```

@@ -259,7 +259,7 @@ The model checkpoint monitored validation loss and preserved the model from the 
 | -------------------- | -----------: |
 | Training Accuracy    |         ~98% |
 | Validation Accuracy  |         ~85% |
-| Test Accuracy        |          81% |
+| Test Accuracy        |       83.66% |
 | Trainable Parameters | 8.48 million |
 | Training Images      |          711 |
 
@@ -284,7 +284,7 @@ The following modifications were applied:
 | Hyperparameter         |                            Value |
 | ---------------------- | -------------------------------: |
 | Input Image Size       |                    128 x 128 x 3 |
-| Batch Size             |                               32 |
+| Batch Size             |                               64 |
 | Maximum Epochs         |                               30 |
 | Optimizer              |                             Adam |
 | Learning Rate          |                            0.001 |
@@ -311,33 +311,35 @@ Although the optimized architecture successfully reduced model complexity and ov
 
 ### Optimized Training Results
 
-| Metric                    |   Score |
-| ------------------------- | ------: |
-| Final Training Accuracy   | ~64.56% |
-| Final Validation Accuracy | ~63.16% |
-| Test Accuracy             |  66.01% |
-| Precision                 |  68.33% |
-| Recall                    |  66.01% |
-| F1-Score                  |  66.28% |
-| Trainable Parameters      | 101,894 |
+| Metric                   |   Score |
+| ------------------------ | ------: |
+| Selected Batch Size      |      64 |
+| Best Validation Loss     |  0.9690 |
+| Best Validation Accuracy |  65.79% |
+| Test Loss                |  0.8969 |
+| Test Accuracy            |  68.63% |
+| Precision                |  66.83% |
+| Recall                   |  68.63% |
+| F1-Score                 |  66.11% |
+| Trainable Parameters     | 101,894 |
 
 #### Optimized Class Performance
 
 | Class   | Precision | Recall | F1-Score |
 | ------- | --------: | -----: | -------: |
-| Bete    |      0.80 |   0.55 |     0.65 |
-| Cray    |      0.17 |   0.17 |     0.17 |
-| Discuss |      0.96 |   0.90 |     0.93 |
-| Gold    |      0.85 |   0.90 |     0.88 |
-| Guppy   |      0.45 |   0.66 |     0.54 |
-| Oscar   |      0.50 |   0.41 |     0.45 |
+| Bete    |      0.68 |   0.52 |     0.59 |
+| Cray    |      0.00 |   0.00 |     0.00 |
+| Discuss |      1.00 |   0.90 |     0.95 |
+| Gold    |      0.88 |   0.90 |     0.89 |
+| Guppy   |      0.47 |   0.90 |     0.62 |
+| Oscar   |      0.53 |   0.41 |     0.46 |
 
 ## Baseline vs Optimized Model Comparison
 
 | Model         | Test Accuracy | Precision | Recall | F1-Score |
 | ------------- | ------------: | --------: | -----: | -------: |
 | Baseline CNN  |        83.66% |    84.88% | 83.66% |   82.96% |
-| Optimized CNN |        66.01% |    68.33% | 66.01% |   66.28% |
+| Optimized CNN |        68.63% |    66.83% | 68.63% |   66.11% |
 
 ### Comparison Discussion
 
@@ -349,13 +351,28 @@ The results suggest that replacing the large Flatten-based classification head w
 
 The baseline therefore remains the better-performing model for this dataset, although its training curves indicate that additional regularization could still improve its generalization. A future model could use a less aggressive combination of regularization techniques, such as lower Dropout rates or a larger dense classification layer.
 
+### Batch Size Hyperparameter Optimization
+
+Two batch-size configurations were evaluated using the optimized CNN architecture. All other major training settings, including the learning rate, dataset split, random seed, and maximum number of epochs, were kept constant. The configurations were compared using validation performance rather than the held-out test dataset.
+
+| Batch Size | Best Validation Loss | Best Validation Accuracy |
+| ---------- | -------------------: | -----------------------: |
+| 32         |               1.0404 |                   63.16% |
+| 64         |               0.9690 |                   65.79% |
+
+Batch size 64 produced both a lower validation loss and higher validation accuracy. Because early stopping and model checkpointing were based on validation loss, batch size 64 was selected for the final optimized model.
+
+The larger batch size also reduced the number of training steps per epoch from approximately 23 steps with batch size 32 to 12 steps with batch size 64. In this experiment, batch size 64 provided more stable validation performance and improved final test accuracy from 66.01% in the earlier optimized run to 68.63%.
+
+Although accuracy and recall improved, weighted precision and F1-score remained similar. This demonstrates that improving one evaluation metric does not necessarily improve performance uniformly across all classes.
+
 ## Optimized CNN Confusion Matrix
 
 The confusion matrix below shows the classification performance of the optimized CNN across all six fish species.
 
 ![Optimized CNN Confusion Matrix](outputs/optimized/confusion_matrix.png)
 
-The Cray class was the most difficult class for the optimized model, achieving a precision and recall of only 0.17. Cray also contains the fewest images in the dataset, with only 56 training examples, which may contribute to this poor performance. Visual similarities between Cray and other classes may also contribute to classification errors.
+The Cray class was the most difficult class for the final optimized model, with both precision and recall equal to 0.00. This means that none of the 12 Cray images in the held-out test set were correctly classified. Cray also contains the fewest examples in the dataset, with only 56 training images, which may contribute to the model's difficulty learning robust features for this class. Visual similarities between Cray and other classes may also contribute to these classification errors.
 
 The model performs strongest on classes such as Gold and Discuss, which contain more training examples and have more visually distinctive characteristics.
 
