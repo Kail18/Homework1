@@ -9,6 +9,9 @@ from data_split import (
     display_split_summary,
 )
 
+from image_preprocessing import create_datasets
+import tensorflow as tf
+
 def main():
 
     # Set the data directory path and directory setup
@@ -74,6 +77,44 @@ def main():
     )
 
     display_split_summary(split_data)
+
+    split_csv = (
+        "homework_three/data/splits/"
+        "dataset_splits.csv"
+    )
+
+    (
+        train_dataset,
+        validation_dataset,
+        test_dataset,
+        class_mapping,
+    ) = create_datasets(
+        split_csv
+    )
+
+    print("\nClass Mapping")
+    print("-------------")
+
+    for class_name, class_id in class_mapping.items():
+        print(
+            f"{class_name}: {class_id}"
+        )
+
+    for images, labels in train_dataset.take(1):
+        print("\nTraining Batch")
+        print("--------------")
+        print(
+            f"Image batch shape: {images.shape}"
+        )
+        print(
+            f"Label batch shape: {labels.shape}"
+        )
+        print(
+            f"Minimum pixel value: {tf.reduce_min(images).numpy():.4f}"
+        )
+        print(
+            f"Maximum pixel value: {tf.reduce_max(images).numpy():.4f}"
+        )
 
 
 if __name__ == "__main__":
