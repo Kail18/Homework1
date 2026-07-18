@@ -378,9 +378,9 @@ The model performs strongest on classes such as Gold and Discuss, which contain 
 
 ## Training Curve Comparison
 
-The following visualization compares baseline and optimized CNN training behavior.
+The following visualization compares the training and validation accuracy and loss of the baseline and optimized CNNs. The optimized model's confusion matrix is included to show its final multiclass classification performance.
 
-![CNN Training Comparison](outputs/model_comparison/training_comparison.png)
+![CNN Training Comparison](homework_three/outputs/model_comparison/training_comparison.png)
 
 # Conclusion
 

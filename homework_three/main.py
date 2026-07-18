@@ -27,6 +27,7 @@ from train import train_model
 
 from training_visualization import (
     plot_training_history,
+    plot_model_comparison,
 )
 
 from model_evaluation import (
@@ -446,6 +447,23 @@ def main():
         class_mapping=optimized_class_mapping,
         output_directory=optimized_output_directory,
         model_name="Optimized CNN",
+    )
+
+    # =============================================
+    # Combined Model Comparison Visualization
+    # =============================================
+
+    plot_model_comparison(
+        baseline_history=baseline_history,
+        optimized_history=optimized_history,
+        optimized_confusion_matrix_path=(
+            "homework_three/outputs/optimized/"
+            "confusion_matrix.png"
+        ),
+        output_directory=(
+            "homework_three/outputs/"
+            "model_comparison"
+        ),
     )
 
     # =============================================
