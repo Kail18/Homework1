@@ -52,15 +52,18 @@ The dataset contains the following image formats:
 
 ```text
 800 x 600 pixels
+```
+
 | Color Mode | Count |
-|---|---:|
-| RGB | 1014 |
-| RGBA | 2 |
+| ---------- | ----: |
+| RGB        |  1014 |
+| RGBA       |     2 |
 
 The preprocessing pipeline converts all images to three-channel RGB format before they are passed to the CNN.
 
 No corrupted images were detected during the dataset audit.
-```
+
+---
 
 ## Train, Validation, and Test Split
 
