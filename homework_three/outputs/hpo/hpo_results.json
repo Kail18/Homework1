@@ -1,0 +1,98 @@
+[
+    {
+        "learning_rate": 0.01,
+        "batch_size": 32,
+        "dropout_rate": 0.3,
+        "best_epoch": 5,
+        "best_val_loss": 1.752526879310608,
+        "val_accuracy_at_best_epoch": 0.19736842811107635
+    },
+    {
+        "learning_rate": 0.01,
+        "batch_size": 32,
+        "dropout_rate": 0.5,
+        "best_epoch": 10,
+        "best_val_loss": 1.4282914400100708,
+        "val_accuracy_at_best_epoch": 0.41447368264198303
+    },
+    {
+        "learning_rate": 0.01,
+        "batch_size": 64,
+        "dropout_rate": 0.3,
+        "best_epoch": 20,
+        "best_val_loss": 1.2366633415222168,
+        "val_accuracy_at_best_epoch": 0.5263158082962036
+    },
+    {
+        "learning_rate": 0.01,
+        "batch_size": 64,
+        "dropout_rate": 0.5,
+        "best_epoch": 7,
+        "best_val_loss": 1.3974324464797974,
+        "val_accuracy_at_best_epoch": 0.3618420958518982
+    },
+    {
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "dropout_rate": 0.3,
+        "best_epoch": 12,
+        "best_val_loss": 1.054370641708374,
+        "val_accuracy_at_best_epoch": 0.6184210777282715
+    },
+    {
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "dropout_rate": 0.5,
+        "best_epoch": 17,
+        "best_val_loss": 0.9703547954559326,
+        "val_accuracy_at_best_epoch": 0.6578947305679321
+    },
+    {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "dropout_rate": 0.3,
+        "best_epoch": 21,
+        "best_val_loss": 1.0569859743118286,
+        "val_accuracy_at_best_epoch": 0.6381579041481018
+    },
+    {
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "dropout_rate": 0.5,
+        "best_epoch": 26,
+        "best_val_loss": 1.0717413425445557,
+        "val_accuracy_at_best_epoch": 0.5855262875556946
+    },
+    {
+        "learning_rate": 0.0001,
+        "batch_size": 32,
+        "dropout_rate": 0.3,
+        "best_epoch": 30,
+        "best_val_loss": 1.3261992931365967,
+        "val_accuracy_at_best_epoch": 0.44736841320991516
+    },
+    {
+        "learning_rate": 0.0001,
+        "batch_size": 32,
+        "dropout_rate": 0.5,
+        "best_epoch": 30,
+        "best_val_loss": 1.3912839889526367,
+        "val_accuracy_at_best_epoch": 0.44736841320991516
+    },
+    {
+        "learning_rate": 0.0001,
+        "batch_size": 64,
+        "dropout_rate": 0.3,
+        "best_epoch": 30,
+        "best_val_loss": 1.4193378686904907,
+        "val_accuracy_at_best_epoch": 0.41447368264198303
+    },
+    {
+        "learning_rate": 0.0001,
+        "batch_size": 64,
+        "dropout_rate": 0.5,
+        "best_epoch": 30,
+        "best_val_loss": 1.4771026372909546,
+        "val_accuracy_at_best_epoch": 0.42763158679008484
+    }
+]

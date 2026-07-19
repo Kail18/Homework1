@@ -1,0 +1,7 @@
+# Homework 3 trained models and compressed outputs
+homework_three/outputs.zip
+homework_three/outputs/**/*.keras
+
+# Python cache files
+__pycache__/
+*.py[cod]

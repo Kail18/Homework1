@@ -1,3 +1,7 @@
+import json
+import shutil
+from pathlib import Path
+
 import project_setup
 import tensorflow as tf
 
@@ -166,7 +170,7 @@ def main():
     )
 
     # =============================================
-    # Create Default Datasets
+    # Create Baseline Datasets
     # Baseline uses batch size 32
     # =============================================
 
@@ -228,7 +232,7 @@ def main():
         "best_model.keras"
     )
 
-    # Evaluate baseline model on untouched test set
+    # Evaluate baseline on held-out test set
     baseline_results = evaluate_model(
         model=saved_baseline_model,
         test_dataset=test_dataset,
@@ -238,150 +242,472 @@ def main():
     )
 
     # =============================================
-    # Batch Size Hyperparameter Optimization
-    # Test batch sizes 32 and 64
+    # Grid Search Hyperparameter Optimization
     # =============================================
+
+    learning_rates = [
+        0.01,
+        0.001,
+        0.0001,
+    ]
 
     batch_sizes = [
         32,
         64,
     ]
 
-    batch_size_results = {}
+    dropout_rates = [
+        0.3,
+        0.5,
+    ]
 
-    for batch_size in batch_sizes:
+    hpo_results = []
 
-        print(
-            "\n============================================="
-        )
+    best_validation_loss = float(
+        "inf"
+    )
 
-        print(
-            f"Testing Optimized CNN "
-            f"with Batch Size: {batch_size}"
-        )
+    best_configuration = None
+    best_model_path = None
+    best_history = None
 
-        print(
-            "============================================="
-        )
+    configuration_number = 0
 
-        (
-            experiment_train_dataset,
-            experiment_validation_dataset,
-            _,
-            _,
-        ) = create_datasets(
-            split_csv,
-            batch_size=batch_size,
-        )
-
-        # Reset random seed so both experiments
-        # begin from the same reproducible seed.
-        tf.keras.utils.set_random_seed(
-            42
-        )
-
-        experiment_model = build_optimized_cnn(
-            number_of_classes
-        )
-
-        experiment_model = compile_optimized_cnn(
-            experiment_model
-        )
-
-        experiment_output_directory = (
-            "homework_three/outputs/hpo/"
-            f"batch_size_{batch_size}"
-        )
-
-        experiment_history = train_model(
-            model=experiment_model,
-            train_dataset=experiment_train_dataset,
-            validation_dataset=experiment_validation_dataset,
-            output_directory=experiment_output_directory,
-            epochs=30,
-        )
-
-        best_validation_loss = min(
-            experiment_history.history[
-                "val_loss"
-            ]
-        )
-
-        best_validation_accuracy = max(
-            experiment_history.history[
-                "val_accuracy"
-            ]
-        )
-
-        batch_size_results[
-            batch_size
-        ] = {
-            "best_val_loss":
-                best_validation_loss,
-
-            "best_val_accuracy":
-                best_validation_accuracy,
-        }
+    total_configurations = (
+        len(learning_rates)
+        * len(batch_sizes)
+        * len(dropout_rates)
+    )
 
     # =============================================
-    # Display Batch Size HPO Results
+    # Run Grid Search
+    # =============================================
+
+    for learning_rate in learning_rates:
+
+        for batch_size in batch_sizes:
+
+            for dropout_rate in dropout_rates:
+
+                configuration_number += 1
+
+                print(
+                    "\n============================================="
+                )
+
+                print(
+                    f"Hyperparameter Configuration "
+                    f"{configuration_number} "
+                    f"of {total_configurations}"
+                )
+
+                print(
+                    "============================================="
+                )
+
+                print(
+                    f"Learning Rate: "
+                    f"{learning_rate}"
+                )
+
+                print(
+                    f"Batch Size: "
+                    f"{batch_size}"
+                )
+
+                print(
+                    f"Dropout Rate: "
+                    f"{dropout_rate}"
+                )
+
+                # =============================================
+                # Create Datasets for Current Batch Size
+                # =============================================
+
+                (
+                    experiment_train_dataset,
+                    experiment_validation_dataset,
+                    _,
+                    _,
+                ) = create_datasets(
+                    split_csv,
+                    batch_size=batch_size,
+                )
+
+                # Clear previous TensorFlow model state
+                tf.keras.backend.clear_session()
+
+                # Reset random seed so each configuration
+                # starts from a reproducible state
+                tf.keras.utils.set_random_seed(
+                    42
+                )
+
+                # =============================================
+                # Build Current HPO Model
+                # =============================================
+
+                experiment_model = (
+                    build_optimized_cnn(
+                        number_of_classes,
+                        dropout_rate=dropout_rate,
+                    )
+                )
+
+                experiment_model = (
+                    compile_optimized_cnn(
+                        experiment_model,
+                        learning_rate=learning_rate,
+                    )
+                )
+
+                configuration_name = (
+                    f"lr_{learning_rate}_"
+                    f"batch_{batch_size}_"
+                    f"dropout_{dropout_rate}"
+                )
+
+                experiment_output_directory = (
+                    "homework_three/outputs/hpo/"
+                    f"{configuration_name}"
+                )
+
+                # =============================================
+                # Train Current Configuration
+                # =============================================
+
+                experiment_history = train_model(
+                    model=experiment_model,
+                    train_dataset=(
+                        experiment_train_dataset
+                    ),
+                    validation_dataset=(
+                        experiment_validation_dataset
+                    ),
+                    output_directory=(
+                        experiment_output_directory
+                    ),
+                    epochs=30,
+                )
+
+                validation_losses = (
+                    experiment_history.history[
+                        "val_loss"
+                    ]
+                )
+
+                validation_accuracies = (
+                    experiment_history.history[
+                        "val_accuracy"
+                    ]
+                )
+
+                # Find the epoch with the lowest
+                # validation loss
+                best_epoch_index = min(
+                    range(
+                        len(
+                            validation_losses
+                        )
+                    ),
+                    key=(
+                        validation_losses.__getitem__
+                    ),
+                )
+
+                configuration_validation_loss = (
+                    validation_losses[
+                        best_epoch_index
+                    ]
+                )
+
+                configuration_validation_accuracy = (
+                    validation_accuracies[
+                        best_epoch_index
+                    ]
+                )
+
+                configuration_best_epoch = (
+                    best_epoch_index + 1
+                )
+
+                print(
+                    "\nConfiguration Results"
+                )
+
+                print(
+                    "---------------------"
+                )
+
+                print(
+                    f"Best Epoch: "
+                    f"{configuration_best_epoch}"
+                )
+
+                print(
+                    f"Best Validation Loss: "
+                    f"{configuration_validation_loss:.4f}"
+                )
+
+                print(
+                    f"Validation Accuracy at "
+                    f"Best Epoch: "
+                    f"{configuration_validation_accuracy:.4f}"
+                )
+
+                # =============================================
+                # Save Configuration Results
+                # =============================================
+
+                configuration_results = {
+                    "learning_rate":
+                        learning_rate,
+
+                    "batch_size":
+                        batch_size,
+
+                    "dropout_rate":
+                        dropout_rate,
+
+                    "best_epoch":
+                        configuration_best_epoch,
+
+                    "best_val_loss":
+                        configuration_validation_loss,
+
+                    "val_accuracy_at_best_epoch":
+                        configuration_validation_accuracy,
+                }
+
+                hpo_results.append(
+                    configuration_results
+                )
+
+                # =============================================
+                # Track Global Best Configuration
+                # =============================================
+
+                if (
+                    configuration_validation_loss
+                    < best_validation_loss
+                ):
+
+                    best_validation_loss = (
+                        configuration_validation_loss
+                    )
+
+                    best_configuration = {
+                        "learning_rate":
+                            learning_rate,
+
+                        "batch_size":
+                            batch_size,
+
+                        "dropout_rate":
+                            dropout_rate,
+
+                        "best_epoch":
+                            configuration_best_epoch,
+
+                        "best_val_loss":
+                            configuration_validation_loss,
+
+                        "val_accuracy_at_best_epoch":
+                            configuration_validation_accuracy,
+                    }
+
+                    best_model_path = (
+                        Path(
+                            experiment_output_directory
+                        )
+                        / "best_model.keras"
+                    )
+
+                    best_history = (
+                        experiment_history
+                    )
+
+    # =============================================
+    # Save Complete HPO Results
+    # =============================================
+
+    hpo_output_directory = Path(
+        "homework_three/outputs/hpo"
+    )
+
+    hpo_output_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    hpo_results_path = (
+        hpo_output_directory
+        / "hpo_results.json"
+    )
+
+    with open(
+        hpo_results_path,
+        "w",
+    ) as file:
+
+        json.dump(
+            hpo_results,
+            file,
+            indent=4,
+        )
+
+    # =============================================
+    # Display Grid Search Results
     # =============================================
 
     print(
-        "\nBatch Size HPO Results"
+        "\n============================================="
     )
 
     print(
-        "----------------------"
+        "Grid Search HPO Results"
     )
 
-    for (
-        batch_size,
-        results,
-    ) in batch_size_results.items():
+    print(
+        "============================================="
+    )
+
+    for index, result in enumerate(
+        hpo_results,
+        start=1,
+    ):
 
         print(
-            f"\nBatch Size: "
-            f"{batch_size}"
+            f"\nConfiguration {index}"
+        )
+
+        print(
+            f"Learning Rate: "
+            f"{result['learning_rate']}"
+        )
+
+        print(
+            f"Batch Size: "
+            f"{result['batch_size']}"
+        )
+
+        print(
+            f"Dropout Rate: "
+            f"{result['dropout_rate']}"
         )
 
         print(
             f"Best Validation Loss: "
-            f"{results['best_val_loss']:.4f}"
+            f"{result['best_val_loss']:.4f}"
         )
 
         print(
-            f"Best Validation Accuracy: "
-            f"{results['best_val_accuracy']:.4f}"
+            f"Validation Accuracy at "
+            f"Best Epoch: "
+            f"{result['val_accuracy_at_best_epoch']:.4f}"
         )
 
-    # Select the batch size with
-    # the lowest validation loss.
-    best_batch_size = min(
-        batch_size_results,
-        key=lambda batch_size:
-            batch_size_results[
-                batch_size
-            ][
-                "best_val_loss"
-            ],
+        print(
+            f"Best Epoch: "
+            f"{result['best_epoch']}"
+        )
+
+    # =============================================
+    # Display Best Hyperparameter Configuration
+    # =============================================
+
+    print(
+        "\n============================================="
     )
 
     print(
-        "\nSelected Batch Size"
+        "Best Hyperparameter Configuration"
     )
 
     print(
-        "-------------------"
+        "============================================="
     )
 
     print(
-        f"Best Batch Size: "
-        f"{best_batch_size}"
+        f"Learning Rate: "
+        f"{best_configuration['learning_rate']}"
+    )
+
+    print(
+        f"Batch Size: "
+        f"{best_configuration['batch_size']}"
+    )
+
+    print(
+        f"Dropout Rate: "
+        f"{best_configuration['dropout_rate']}"
+    )
+
+    print(
+        f"Best Epoch: "
+        f"{best_configuration['best_epoch']}"
+    )
+
+    print(
+        f"Best Validation Loss: "
+        f"{best_configuration['best_val_loss']:.4f}"
+    )
+
+    print(
+        f"Validation Accuracy at Best Epoch: "
+        f"{best_configuration['val_accuracy_at_best_epoch']:.4f}"
     )
 
     # =============================================
-    # Create Final Optimized Datasets
+    # Save Best Configuration Information
+    # =============================================
+
+    best_configuration_path = (
+        hpo_output_directory
+        / "best_configuration.json"
+    )
+
+    with open(
+        best_configuration_path,
+        "w",
+    ) as file:
+
+        json.dump(
+            best_configuration,
+            file,
+            indent=4,
+        )
+
+    # =============================================
+    # Save Best HPO Model as Final Optimized Model
+    # =============================================
+
+    optimized_output_directory = Path(
+        "homework_three/outputs/optimized"
+    )
+
+    optimized_output_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    final_optimized_model_path = (
+        optimized_output_directory
+        / "best_model.keras"
+    )
+
+    shutil.copy2(
+        best_model_path,
+        final_optimized_model_path,
+    )
+
+    print(
+        "\nBest HPO model saved to: "
+        f"{final_optimized_model_path}"
+    )
+
+    # =============================================
+    # Create Datasets Using Best Batch Size
     # =============================================
 
     (
@@ -391,61 +717,49 @@ def main():
         optimized_class_mapping,
     ) = create_datasets(
         split_csv,
-        batch_size=best_batch_size,
+        batch_size=(
+            best_configuration[
+                "batch_size"
+            ]
+        ),
     )
 
     # =============================================
-    # Final Optimized CNN
+    # Load Final Optimized Model
     # =============================================
 
-    tf.keras.utils.set_random_seed(
-        42
+    saved_optimized_model = load_saved_model(
+        str(
+            final_optimized_model_path
+        )
     )
 
-    optimized_model = build_optimized_cnn(
-        number_of_classes
-    )
+    saved_optimized_model.summary()
 
-    optimized_model = compile_optimized_cnn(
-        optimized_model
-    )
+    # =============================================
+    # Plot Best Optimized Training History
+    # =============================================
 
-    optimized_model.summary()
-
-    optimized_output_directory = (
-        "homework_three/outputs/optimized"
-    )
-
-    # Train optimized model using
-    # selected batch size.
-    optimized_history = train_model(
-        model=optimized_model,
-        train_dataset=optimized_train_dataset,
-        validation_dataset=optimized_validation_dataset,
-        output_directory=optimized_output_directory,
-        epochs=30,
-    )
-
-    # Plot optimized training history
     plot_training_history(
-        history=optimized_history,
-        output_directory=optimized_output_directory,
+        history=best_history,
+        output_directory=str(
+            optimized_output_directory
+        ),
         model_name="Optimized CNN",
     )
 
-    # Load best optimized checkpoint
-    saved_optimized_model = load_saved_model(
-        "homework_three/outputs/optimized/"
-        "best_model.keras"
-    )
+    # =============================================
+    # Evaluate Final Optimized Model
+    # Test set is used only after HPO is complete
+    # =============================================
 
-    # Evaluate final optimized model
-    # on untouched test dataset.
     optimized_results = evaluate_model(
         model=saved_optimized_model,
         test_dataset=optimized_test_dataset,
         class_mapping=optimized_class_mapping,
-        output_directory=optimized_output_directory,
+        output_directory=str(
+            optimized_output_directory
+        ),
         model_name="Optimized CNN",
     )
 
@@ -455,7 +769,7 @@ def main():
 
     plot_model_comparison(
         baseline_history=baseline_history,
-        optimized_history=optimized_history,
+        optimized_history=best_history,
         optimized_confusion_matrix_path=(
             "homework_three/outputs/optimized/"
             "confusion_matrix.png"

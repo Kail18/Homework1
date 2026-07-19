@@ -76,14 +76,17 @@ The dataset was divided using a stratified split:
 - Training: 70%
 - Validation: 15%
 - Testing: 15%
-  A fixed random seed of 42 is used to make the split reproducible.
-  The final split contains:
-  | Split | Number of Images |
-  |---|---:|
-  | Training | 711 |
-  | Validation | 152 |
-  | Testing | 153 |
-  | **Total** | **1016** |
+
+A fixed random seed of 42 is used to make the split reproducible.
+
+The final split contains:
+
+| Split      | Number of Images |
+| ---------- | ---------------: |
+| Training   |              711 |
+| Validation |              152 |
+| Testing    |              153 |
+| **Total**  |         **1016** |
 
 ### Per-Class Split Distribution
 
@@ -248,22 +251,25 @@ The model checkpoint monitored validation loss and preserved the model from the 
 | Guppy   |      0.72 |   0.97 |     0.82 |
 | Oscar   |      0.85 |   0.77 |     0.81 |
 
-### Hyperparameter optimization / Improve CNN architecture
+### Optimization Strategy
 
-- Replace Flatten() with GlobalAveragePooling2D() (Makes the model focus on what features exist rather than where they appear)
-- Add Dropout (to help force the model to learn more generalized patterns vs specific patterns from the training images)
-- Reduce parameter count (I dont need a big network since the dataset is small)
-- Tune learning rate and batch size (attempt to improve stability and create better generalizations)
+The baseline CNN achieved strong classification performance but showed evidence of overfitting. Training accuracy approached 98%, while validation performance plateaued at a lower level. Therefore, the optimization process focused on reducing overfitting and improving generalization rather than increasing the model's ability to memorize the training data.
 
-| Metric               |       Result |
-| -------------------- | -----------: |
-| Training Accuracy    |         ~98% |
-| Validation Accuracy  |         ~85% |
-| Test Accuracy        |       83.66% |
-| Trainable Parameters | 8.48 million |
-| Training Images      |          711 |
+The following architecture changes were introduced:
 
-With these metrics I do not need to improve the models memorization. The main thing I need to focus on is generalization.
+- Replaced `Flatten()` with `GlobalAveragePooling2D()` to substantially reduce the number of trainable parameters.
+- Reduced the fully connected hidden layer from 256 units to 64 units.
+- Added Dropout regularization to reduce neuron dependency and discourage memorization.
+- Retained data augmentation to expose the model to variations in orientation and contrast.
+- Used early stopping and model checkpointing based on validation loss.
+
+A systematic Grid Search was then performed over three hyperparameters:
+
+- Learning rate: `0.01`, `0.001`, and `0.0001`
+- Batch size: `32` and `64`
+- Dropout rate: `0.3` and `0.5`
+
+This produced a total of 12 hyperparameter configurations. Each configuration was evaluated using validation loss, and the held-out test dataset was not used for hyperparameter selection.
 
 ## Optimized CNN Architecture
 
@@ -284,7 +290,7 @@ The following modifications were applied:
 | Hyperparameter         |                            Value |
 | ---------------------- | -------------------------------: |
 | Input Image Size       |                    128 x 128 x 3 |
-| Batch Size             |                               64 |
+| Batch Size             |                               32 |
 | Maximum Epochs         |                               30 |
 | Optimizer              |                             Adam |
 | Learning Rate          |                            0.001 |
@@ -293,78 +299,112 @@ The following modifications were applied:
 | Conv Layer 2 Filters   |                               64 |
 | Conv Layer 3 Filters   |                              128 |
 | Global Average Pooling |                          Enabled |
-| Dropout                |                          Enabled |
+| Dropout Rate           |                              0.5 |
 | Dense Layer Units      |                               64 |
 | Output Classes         |                                6 |
 
 ## Optimized Model Training Analysis
 
-The optimized CNN was designed to reduce the overfitting observed in the baseline model by replacing the large Flatten-based classification head with GlobalAveragePooling2D, reducing the dense layer size, and adding Dropout regularization.
+The optimized CNN was designed to reduce the overfitting observed in the baseline model by replacing the large Flatten-based classification head with `GlobalAveragePooling2D`, reducing the dense layer size, and adding Dropout regularization.
 
-These changes substantially reduced the model from approximately 8.48 million trainable parameters to 101,894 trainable parameters.
+These architecture changes reduced the model from approximately 8.48 million trainable parameters to 101,894 trainable parameters.
 
-The optimized model showed a much smaller gap between training and validation accuracy than the baseline model, indicating that overfitting was reduced. However, both training and validation accuracy remained substantially lower than those of the baseline model. This suggests that the optimized architecture may have been over-regularized or lacked sufficient capacity to learn all of the discriminative features required for the six fish classes.
+A Grid Search was performed across 12 combinations of learning rate, batch size, and Dropout rate. The best-performing configuration was selected using the lowest validation loss.
 
-The lowest validation loss was achieved at epoch 20. Training continued until epoch 25, when early stopping was triggered, and the model weights from epoch 20 were restored.
+The selected configuration used:
 
-Although the optimized architecture successfully reduced model complexity and overfitting, it did not improve performance on the held-out test dataset.
+- Learning rate: `0.001`
+- Batch size: `32`
+- Dropout rate: `0.5`
 
-### Optimized Training Results
+The best configuration reached its lowest validation loss of 0.9704 at epoch 17, with a validation accuracy of 65.79%.
 
-| Metric                   |   Score |
-| ------------------------ | ------: |
-| Selected Batch Size      |      64 |
-| Best Validation Loss     |  0.9690 |
-| Best Validation Accuracy |  65.79% |
-| Test Loss                |  0.8969 |
-| Test Accuracy            |  68.63% |
-| Precision                |  66.83% |
-| Recall                   |  68.63% |
-| F1-Score                 |  66.11% |
-| Trainable Parameters     | 101,894 |
+The hyperparameter experiments showed that the learning rate had a substantial effect on convergence. A learning rate of 0.01 generally produced higher validation losses, suggesting that the optimization steps were too aggressive for this architecture. A learning rate of 0.0001 improved slowly and generally required the full 30 epochs, suggesting that convergence was too slow within the available training budget. The intermediate learning rate of 0.001 produced the best overall validation performance.
+
+For the winning learning rate and batch-size combination, a Dropout rate of 0.5 achieved a lower validation loss than 0.3. The final selected batch size was 32.
+
+Although the optimized architecture reduced model complexity and showed less evidence of severe overfitting, its test performance remained below that of the baseline CNN. This suggests that the combination of Global Average Pooling, a smaller dense layer, and Dropout may have reduced the model's capacity too aggressively, resulting in underfitting.
+
+### Optimized Model Results
+
+| Metric                            |   Score |
+| --------------------------------- | ------: |
+| Selected Learning Rate            |   0.001 |
+| Selected Batch Size               |      32 |
+| Selected Dropout Rate             |     0.5 |
+| Best Epoch                        |      17 |
+| Best Validation Loss              |  0.9704 |
+| Validation Accuracy at Best Epoch |  65.79% |
+| Test Loss                         |  0.9346 |
+| Test Accuracy                     |  67.97% |
+| Precision                         |  67.89% |
+| Recall                            |  67.97% |
+| F1-Score                          |  65.04% |
+| Trainable Parameters              | 101,894 |
 
 #### Optimized Class Performance
 
 | Class   | Precision | Recall | F1-Score |
 | ------- | --------: | -----: | -------: |
-| Bete    |      0.68 |   0.52 |     0.59 |
+| Bete    |      0.70 |   0.66 |     0.68 |
 | Cray    |      0.00 |   0.00 |     0.00 |
-| Discuss |      1.00 |   0.90 |     0.95 |
-| Gold    |      0.88 |   0.90 |     0.89 |
-| Guppy   |      0.47 |   0.90 |     0.62 |
-| Oscar   |      0.53 |   0.41 |     0.46 |
+| Discuss |      0.93 |   0.87 |     0.90 |
+| Gold    |      0.81 |   0.81 |     0.81 |
+| Guppy   |      0.47 |   0.93 |     0.62 |
+| Oscar   |      0.78 |   0.32 |     0.45 |
 
 ## Baseline vs Optimized Model Comparison
 
 | Model         | Test Accuracy | Precision | Recall | F1-Score |
 | ------------- | ------------: | --------: | -----: | -------: |
 | Baseline CNN  |        83.66% |    84.88% | 83.66% |   82.96% |
-| Optimized CNN |        68.63% |    66.83% | 68.63% |   66.11% |
+| Optimized CNN |        67.97% |    67.89% | 67.97% |   65.04% |
 
 ### Comparison Discussion
 
-The optimized CNN substantially reduced model complexity and showed less separation between training and validation performance, indicating that the regularization techniques were effective at reducing overfitting. However, this improvement came at the cost of classification performance.
+The optimized CNN substantially reduced model complexity, decreasing the trainable parameter count from approximately 8.48 million to 101,894. The smaller model and added Dropout regularization reduced the severe training and validation separation observed in the baseline model. However, this reduction in model capacity came at the cost of classification performance.
 
-The baseline CNN achieved the strongest held-out test results, with 83.66% accuracy and an F1-score of 82.96%, compared with 66.01% accuracy and a 66.28% F1-score for the optimized model.
+The baseline CNN achieved the strongest held-out test results, with 83.66% accuracy and an F1-score of 82.96%. The optimized CNN achieved 67.97% accuracy and an F1-score of 65.04%.
 
-The results suggest that replacing the large Flatten-based classification head with GlobalAveragePooling2D, reducing the dense layer size, and applying two Dropout layers may have reduced model capacity too aggressively. The optimized model appears to have shifted from an overfitting problem toward an underfitting problem.
+These results suggest that replacing the Flatten-based classification head with GlobalAveragePooling2D, reducing the dense layer from 256 to 64 units, and applying a Dropout rate of 0.5 may have reduced model capacity too aggressively. The optimization process reduced overfitting, but the resulting model appears to have shifted toward underfitting.
 
-The baseline therefore remains the better-performing model for this dataset, although its training curves indicate that additional regularization could still improve its generalization. A future model could use a less aggressive combination of regularization techniques, such as lower Dropout rates or a larger dense classification layer.
+Therefore, the baseline CNN remains the strongest-performing model for this dataset. A future architecture could seek a middle ground between the two models, such as retaining Global Average Pooling while increasing the dense layer size or using less aggressive regularization.
 
-### Batch Size Hyperparameter Optimization
+### Grid Search Hyperparameter Optimization
 
-Two batch-size configurations were evaluated using the optimized CNN architecture. All other major training settings, including the learning rate, dataset split, random seed, and maximum number of epochs, were kept constant. The configurations were compared using validation performance rather than the held-out test dataset.
+A systematic Grid Search was used to evaluate three hyperparameters:
 
-| Batch Size | Best Validation Loss | Best Validation Accuracy |
-| ---------- | -------------------: | -----------------------: |
-| 32         |               1.0404 |                   63.16% |
-| 64         |               0.9690 |                   65.79% |
+- Learning rate: `0.01`, `0.001`, `0.0001`
+- Batch size: `32`, `64`
+- Dropout rate: `0.3`, `0.5`
 
-Batch size 64 produced both a lower validation loss and higher validation accuracy. Because early stopping and model checkpointing were based on validation loss, batch size 64 was selected for the final optimized model.
+This resulted in 12 total configurations.
 
-The larger batch size also reduced the number of training steps per epoch from approximately 23 steps with batch size 32 to 12 steps with batch size 64. In this experiment, batch size 64 provided more stable validation performance and improved final test accuracy from 66.01% in the earlier optimized run to 68.63%.
+| Configuration | Learning Rate | Batch Size | Dropout | Best Validation Loss | Validation Accuracy at Best Epoch | Best Epoch |
+| ------------- | ------------: | ---------: | ------: | -------------------: | --------------------------------: | ---------: |
+| 1             |          0.01 |         32 |     0.3 |               1.7525 |                            19.74% |          5 |
+| 2             |          0.01 |         32 |     0.5 |               1.4283 |                            41.45% |         10 |
+| 3             |          0.01 |         64 |     0.3 |               1.2367 |                            52.63% |         20 |
+| 4             |          0.01 |         64 |     0.5 |               1.3974 |                            36.18% |          7 |
+| 5             |         0.001 |         32 |     0.3 |               1.0544 |                            61.84% |         12 |
+| 6             |         0.001 |         32 |     0.5 |           **0.9704** |                        **65.79%** |     **17** |
+| 7             |         0.001 |         64 |     0.3 |               1.0570 |                            63.82% |         21 |
+| 8             |         0.001 |         64 |     0.5 |               1.0717 |                            58.55% |         26 |
+| 9             |        0.0001 |         32 |     0.3 |               1.3262 |                            44.74% |         30 |
+| 10            |        0.0001 |         32 |     0.5 |               1.3913 |                            44.74% |         30 |
+| 11            |        0.0001 |         64 |     0.3 |               1.4193 |                            41.45% |         30 |
+| 12            |        0.0001 |         64 |     0.5 |               1.4771 |                            42.76% |         30 |
 
-Although accuracy and recall improved, weighted precision and F1-score remained similar. This demonstrates that improving one evaluation metric does not necessarily improve performance uniformly across all classes.
+The best configuration was selected based on the lowest validation loss:
+
+```text
+Learning Rate: 0.001
+Batch Size: 32
+Dropout Rate: 0.5
+Best Epoch: 17
+Best Validation Loss: 0.9704
+Validation Accuracy at Best Epoch: 65.79%
+```
 
 ## Optimized CNN Confusion Matrix
 
@@ -384,8 +424,16 @@ The following visualization compares the training and validation accuracy and lo
 
 # Conclusion
 
-The baseline CNN achieved the strongest classification performance but showed evidence of overfitting due to the gap between training and validation performance. The optimized CNN substantially reduced model complexity through Global Average Pooling and Dropout, decreasing the trainable parameter count from approximately 8.48 million to 101,894. These changes reduced the degree of overfitting, but also reduced overall classification performance, suggesting that the optimized architecture may have been over-regularized or lacked sufficient capacity.
+This project demonstrated a complete deep-learning image classification workflow, including dataset inspection, stratified data splitting, preprocessing, augmentation, custom CNN development, systematic hyperparameter tuning, and quantitative model evaluation.
 
-Batch-size hyperparameter testing compared configurations of 32 and 64. Batch size 64 achieved the lower validation loss and higher validation accuracy and was therefore selected for the final optimized model. The final optimized model achieved 68.63% test accuracy compared with 83.66% for the baseline model.
+The baseline CNN achieved the strongest classification performance, reaching 83.66% test accuracy and an F1-score of 82.96%. However, its training and validation curves showed evidence of overfitting, with training performance continuing to improve while validation performance began to plateau or decline.
 
-The largest limitation of this project is the relatively small and imbalanced dataset. The Cray class, which contains the fewest training examples, remained particularly difficult for the optimized model. Future improvements could include less aggressive Dropout, a larger classification head, class weighting, additional training data, transfer learning with a pretrained CNN, or more targeted domain-specific augmentation.
+The optimized CNN reduced the trainable parameter count from approximately 8.48 million to 101,894 by replacing Flatten with Global Average Pooling, reducing the dense classification layer, and introducing Dropout regularization.
+
+A Grid Search evaluated 12 combinations of learning rate, batch size, and Dropout rate. The best configuration used a learning rate of 0.001, batch size of 32, and Dropout rate of 0.5. This configuration achieved the lowest validation loss of 0.9704 at epoch 17.
+
+Despite reducing model complexity and limiting overfitting, the final optimized model achieved only 67.97% test accuracy and a 65.04% F1-score. This indicates that the optimization strategy likely reduced model capacity too aggressively and shifted the model toward underfitting. Therefore, the baseline CNN remained the better-performing classifier.
+
+The largest limitation of this project is the relatively small and imbalanced dataset. The Cray class contains only 56 training images and remained particularly difficult for the optimized model, which failed to correctly classify any Cray examples in the held-out test set.
+
+Future improvements could explore a less aggressive balance between model capacity and regularization, such as increasing the dense layer size, testing lower Dropout rates, applying class weighting, collecting additional training images, using transfer learning with a pretrained CNN, or introducing more targeted domain-specific image augmentation.

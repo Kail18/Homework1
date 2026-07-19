@@ -1,0 +1,8 @@
+{
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "dropout_rate": 0.5,
+    "best_epoch": 17,
+    "best_val_loss": 0.9703547954559326,
+    "val_accuracy_at_best_epoch": 0.6578947305679321
+}

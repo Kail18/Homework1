@@ -1,215 +1,117 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models
 
-
-def build_optimized_cnn(number_of_classes, image_height=128, image_width=128):
-    """
-    Build optimized CNN architecture.
-
-    Improvements over baseline:
-    - Replace Flatten with GlobalAveragePooling2D
-    - Reduce dense layer size
-    - Add dropout regularization
-    - Reduce total parameter count
-    """
-
-    model = models.Sequential(
-    [
-        layers.Input(
-            shape=(
-                image_height,
-                image_width,
-                3,
-            )
-        )
-    ],
-    name="optimized_fish_cnn",
+from image_preprocessing import (
+    create_augmentation_pipeline,
 )
 
-    # -------------------------------------------------
-    # Data Augmentation
-    # -------------------------------------------------
 
-    model.add(
-        layers.RandomFlip(
-            "horizontal",
-            name="random_flip"
-        )
+def build_optimized_cnn(
+    number_of_classes: int,
+    dropout_rate: float = 0.5,
+) -> tf.keras.Model:
+    """Build an optimized CNN with configurable Dropout."""
+
+    data_augmentation = (
+        create_augmentation_pipeline()
     )
 
-    model.add(
-        layers.RandomRotation(
-            0.05,
-            name="random_rotation"
-        )
+    model = tf.keras.Sequential(
+        [
+            tf.keras.layers.Input(
+                shape=(128, 128, 3),
+            ),
+
+            data_augmentation,
+
+            tf.keras.layers.Conv2D(
+                32,
+                (3, 3),
+                activation="relu",
+                padding="same",
+                name="conv_block_1",
+            ),
+
+            tf.keras.layers.MaxPooling2D(
+                (2, 2),
+                name="pool_1",
+            ),
+
+            tf.keras.layers.Conv2D(
+                64,
+                (3, 3),
+                activation="relu",
+                padding="same",
+                name="conv_block_2",
+            ),
+
+            tf.keras.layers.MaxPooling2D(
+                (2, 2),
+                name="pool_2",
+            ),
+
+            tf.keras.layers.Conv2D(
+                128,
+                (3, 3),
+                activation="relu",
+                padding="same",
+                name="conv_block_3",
+            ),
+
+            tf.keras.layers.MaxPooling2D(
+                (2, 2),
+                name="pool_3",
+            ),
+
+            tf.keras.layers.GlobalAveragePooling2D(
+                name="global_average_pooling",
+            ),
+
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                name="dropout_1",
+            ),
+
+            tf.keras.layers.Dense(
+                64,
+                activation="relu",
+                name="dense_classifier",
+            ),
+
+            tf.keras.layers.Dropout(
+                dropout_rate,
+                name="dropout_2",
+            ),
+
+            tf.keras.layers.Dense(
+                number_of_classes,
+                activation="softmax",
+                name="classification_output",
+            ),
+        ],
+        name="optimized_fish_cnn",
     )
-
-    model.add(
-        layers.RandomContrast(
-            0.2,
-            name="random_contrast"
-        )
-    )
-
-
-    # -------------------------------------------------
-    # Convolution Block 1
-    # Input: 128 x 128 x 3
-    # -------------------------------------------------
-
-    model.add(
-        layers.Conv2D(
-            filters=32,
-            kernel_size=(3, 3),
-            activation="relu",
-            padding="same",
-            name="conv_block_1"
-        )
-    )
-
-    model.add(
-        layers.MaxPooling2D(
-            pool_size=(2, 2),
-            name="pool_1"
-        )
-    )
-
-
-    # -------------------------------------------------
-    # Convolution Block 2
-    # -------------------------------------------------
-
-    model.add(
-        layers.Conv2D(
-            filters=64,
-            kernel_size=(3, 3),
-            activation="relu",
-            padding="same",
-            name="conv_block_2"
-        )
-    )
-
-    model.add(
-        layers.MaxPooling2D(
-            pool_size=(2, 2),
-            name="pool_2"
-        )
-    )
-
-
-    # -------------------------------------------------
-    # Convolution Block 3
-    # -------------------------------------------------
-
-    model.add(
-        layers.Conv2D(
-            filters=128,
-            kernel_size=(3, 3),
-            activation="relu",
-            padding="same",
-            name="conv_block_3"
-        )
-    )
-
-    model.add(
-        layers.MaxPooling2D(
-            pool_size=(2, 2),
-            name="pool_3"
-        )
-    )
-
-
-    # -------------------------------------------------
-    # Classification Head
-    # -------------------------------------------------
-
-    # Replacement for Flatten()
-    # Reduces:
-    # 16 x 16 x 128 = 32,768 values
-    # to:
-    # 128 feature averages
-    model.add(
-        layers.GlobalAveragePooling2D(
-            name="global_average_pooling"
-        )
-    )
-
-
-    # Regularization
-    model.add(
-        layers.Dropout(
-            0.5,
-            name="dropout_1"
-        )
-    )
-
-
-    # Smaller dense classifier
-    model.add(
-        layers.Dense(
-            units=64,
-            activation="relu",
-            name="dense_classifier"
-        )
-    )
-
-
-    model.add(
-        layers.Dropout(
-            0.3,
-            name="dropout_2"
-        )
-    )
-
-
-    # Output layer
-    model.add(
-        layers.Dense(
-            units=number_of_classes,
-            activation="softmax",
-            name="classification_output"
-        )
-    )
-
 
     return model
 
 
-
 def compile_optimized_cnn(
-    model,
-    learning_rate=0.001
-):
-    """
-    Compile optimized CNN.
-
-    Initial experiment keeps:
-    - Adam optimizer
-    - Learning rate = 0.001
-    - Sparse categorical crossentropy
-
-    These match the baseline for fair comparison.
-    """
+    model: tf.keras.Model,
+    learning_rate: float = 0.001,
+) -> tf.keras.Model:
+    """Compile the optimized CNN with a configurable learning rate."""
 
     optimizer = tf.keras.optimizers.Adam(
-        learning_rate=learning_rate
+        learning_rate=learning_rate,
     )
 
     model.compile(
         optimizer=optimizer,
-        loss="sparse_categorical_crossentropy",
+        loss=(
+            "sparse_categorical_crossentropy"
+        ),
         metrics=[
-            "accuracy"
-        ]
+            "accuracy",
+        ],
     )
 
     return model
-
-
-
-def print_model_summary(model):
-    """
-    Print optimized model architecture.
-    """
-
-    model.summary()
